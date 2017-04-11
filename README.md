@@ -1,0 +1,1 @@
+# cordova-plugin-continuous-take-pictures

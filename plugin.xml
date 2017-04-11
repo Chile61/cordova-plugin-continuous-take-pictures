@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-continuous-take-pictures" version="0.0.1">
+  <name>ContinuousTakePictures</name>
+  <description>continuous take pictures</description>
+  <license>MIT</license>
+  <repo>https://github.com/servbus/cordova-plugin-continuous-take-pictures.git</repo>
+  <issue>https://github.com/servbus/cordova-plugin-continuous-take-pictures.git/issues</issue>
+  <engines>
+    <engine name="cordova" version=">=6.1.1"/>
+  </engines>
+  <js-module src="www/ContinuousTakePictures.js" name="ContinuousTakePictures">
+    <clobbers target="cordova.plugins.ContinuousTakePictures"/>
+  </js-module>
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="QRCodeScanner">
+        <param name="ios-package" value="HWPQRCodeScanner"/>
+      </feature>
+    </config-file>
+    <resource-file src="src/ios/CDVQRCodeScanner.bundle"/>
+    <header-file src="src/ios/Bridging-Header.h"/>
+
+    <source-file src="src/ios/QRCodeScannerPlugin.swift"/>
+    <source-file src="src/ios/LBXPermissions.swift"/>
+    <source-file src="src/ios/LBXScanLineAnimation.swift"/>
+    <source-file src="src/ios/LBXScanNetAnimation.swift"/>
+    <source-file src="src/ios/LBXScanView.swift"/>
+    <source-file src="src/ios/LBXScanViewController.swift"/>
+    <source-file src="src/ios/LBXScanViewStyle.swift"/>
+    <source-file src="src/ios/LBXScanWrapper.swift"/>
+
+    <framework src="AVFoundation.framework"/>
+    <framework src="AssetsLibrary.framework"/>
+    <framework src="CoreVideo.framework"/>
+    <framework src="QuartzCore.framework"/>
+    <framework src="CoreGraphics.framework"/>
+    <framework src="CoreImage.framework"/>
+    <framework src="AudioToolbox.framework"/>
+  </platform>
+  <platform name="android">
+    <hook type="after_plugin_install" src="hooks/after_plugin_installhook-add-r-import.js" />
+
+    <source-file src="src/android/com/servbus/customcamera/ContinuousTakePictures.java" target-dir="src/com/servbus/customcamera"/>
+    <source-file src="src/android/com/servbus/customcamera/activity/CameraActivity.java" target-dir="src/com/servbus/customcamera/activity"/>
+    <source-file src="src/android/com/servbus/customcamera/utils/BitmapUtils.java" target-dir="src/com/servbus/customcamera/utils"/>
+    <source-file src="src/android/com/servbus/customcamera/utils/CameraUtil.java" target-dir="src/com/servbus/customcamera/utils"/>
+
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="ContinuousTakePictures">
+        <param name="android-package" value="com.servbus.customcamera.ContinuousTakePictures"/>
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <activity android:name=".activity.CameraActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.CAMERA"/>
+      <uses-permission android:name="android.permission.FLASHLIGHT"/>
+      <uses-feature android:name="android.hardware.camera" android:required="true"/>
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    </config-file>
+
+    <resource-file src="src/android/res/layout/activity_camera.xml" target="res/layout/activity_camera.xml" />
+
+    <!--<resource-file src="src/android/res/values/styles.xml" target="res/values/styles.xml" />-->
+    <resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
+    <resource-file src="src/android/res/values/dimens.xml" target="res/values/dimens.xml" />
+
+    <resource-file src="src/android/res/drawable/btn_camera_close_n.png" target="res/drawable/btn_camera_close_n.png" />
+    <resource-file src="src/android/res/drawable/btn_video_shutter_h.png" target="res/drawable/btn_video_shutter_h.png" />
+    <resource-file src="src/android/res/drawable/btn_video_shutter_n.png" target="res/drawable/btn_video_shutter_n.png" />
+    <resource-file src="src/android/res/drawable/img_homepage_camera5.png" target="res/drawable/img_homepage_camera5.png" />
+    <resource-file src="src/android/res/drawable/img_refresh_smallgrey.png" target="res/drawable/img_refresh_smallgrey.png" />
+    <resource-file src="src/android/res/drawable/progress_backround.xml" target="res/drawable/progress_backround.xml" />
+    <resource-file src="src/android/res/drawable/selector_btn_camera_close1.xml" target="res/drawable/selector_btn_camera_close1.xml" />
+    <resource-file src="src/android/res/drawable/selector_btn_flash_light.xml" target="res/drawable/selector_btn_flash_light.xml" />
+    <resource-file src="src/android/res/drawable/selector_video_shutter.xml" target="res/drawable/selector_video_shutter.xml" />
+
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_close.png" target="res/drawable-hdpi/btn_camera_close.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_flash_auto.png" target="res/drawable-hdpi/btn_camera_flash_auto.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_flash_off.png" target="res/drawable-hdpi/btn_camera_flash_off.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_flash_on.png" target="res/drawable-hdpi/btn_camera_flash_on.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_size1_n.png" target="res/drawable-hdpi/btn_camera_size1_n.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_size2_n.png" target="res/drawable-hdpi/btn_camera_size2_n.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_0.png" target="res/drawable-hdpi/btn_camera_timing_0.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_10.png" target="res/drawable-hdpi/btn_camera_timing_10.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_3.png" target="res/drawable-hdpi/btn_camera_timing_3.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_5.png" target="res/drawable-hdpi/btn_camera_timing_5.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera_turn_n.png" target="res/drawable-hdpi/btn_camera_turn_n.png" />
+    
+
+
+    <dependency id="cordova-plugin-compat" version="^1.0.0"/>
+  </platform>
+</plugin>
