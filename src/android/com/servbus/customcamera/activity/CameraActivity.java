@@ -2,7 +2,6 @@ package com.servbus.customcamera.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -25,6 +24,11 @@ import io.cordova.myappb6ea24.R;    //插件安装完成之后，会使用hooks�
 
 import com.servbus.customcamera.utils.BitmapUtils;
 import com.servbus.customcamera.utils.CameraUtil;
+
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,9 +66,10 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     int mDisplayRotate;
     int mViewWidth;
     int mViewHeight;
-    ArrayList<String> res = new ArrayList<String>();
 
     private TextView picCount;
+
+    public static CallbackContext callbackContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,8 +170,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
             //退出相机界面 释放资源
             case R.id.camera_close:
-
-                returnData();
+                finish();
                 break;
 
             //闪光灯
@@ -270,14 +274,14 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 //String img_path = getExternalFilesDir(Environment.DIRECTORY_DCIM).getPath() +
                 //        File.separator + System.currentTimeMillis() + ".jpeg";
 
-                String img_path_tmp = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis();
+                String img_path_tmp = Environment.getExternalStorageDirectory() + "/0tmp/" + System.currentTimeMillis();
                 String img_path = img_path_tmp + ".jpg";
                 String img_path_t = img_path_tmp + "_t.jpg";
 
                 BitmapUtils.saveJPGE_After(context, saveBitmap, img_path, 100);
                 BitmapUtils.saveJPGE_After(context, saveBitmap, img_path_t, 20);
-                res.add(img_path);
 
+                returnData(img_path);
                 picCount.setText(res.size() + "");
                 if (!bitmap.isRecycled()) {
                     bitmap.recycle();
@@ -453,17 +457,17 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         return x;
     }
 
-    @Override
-    public void onBackPressed() {
-        returnData();
-        super.onBackPressed();
-    }
+    private void returnData(String path) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("src", path);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-    private void returnData(){
-        Intent intent = new Intent();
-        intent.putExtra("src", res);
-        setResult(1, intent);
-
-        finish();
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, obj);
+        //true：回调继续保持，即当前返回后后面还会有返回 false:回调结束，即当这个返回后不会再有返回
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
     }
 }

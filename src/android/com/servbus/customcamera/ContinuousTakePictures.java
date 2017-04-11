@@ -79,12 +79,13 @@ public class ContinuousTakePictures extends CordovaPlugin {
      */
     public void scan(final JSONArray args) {
 
-        final CordovaPlugin that = this;
+        final ContinuousTakePictures that = this;
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 Intent intent = new Intent(that.cordova.getActivity().getApplicationContext(), CameraActivity.class);
                 intent.putExtra("hi", "");
+                CameraActivity.callbackContext = that.callbackContext;
                 that.cordova.startActivityForResult(that, intent, 1);
             }
         });
@@ -101,18 +102,6 @@ public class ContinuousTakePictures extends CordovaPlugin {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
-        JSONObject obj = new JSONObject();
-        try {
-            ArrayList<String> res = intent.getStringArrayListExtra("src");
-
-            JSONArray jsonArray = new JSONArray(res);
-
-            obj.putOpt("src", jsonArray);
-        } catch (JSONException e) {
-            Log.d(LOG_TAG, "This should never happen");
-        }
-        //this.success(new PluginResult(PluginResult.Status.OK, obj), this.callback);
-        this.callbackContext.success(obj);
     }
 
 
