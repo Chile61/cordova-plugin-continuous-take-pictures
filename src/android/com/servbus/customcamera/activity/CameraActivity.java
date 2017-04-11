@@ -2,6 +2,7 @@ package com.servbus.customcamera.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -20,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import io.cordova.myappb6ea24.R;    //插件安装完成之后，会使用hooks替换成对应的包
+
 import com.servbus.customcamera.utils.BitmapUtils;
 import com.servbus.customcamera.utils.CameraUtil;
 
@@ -59,6 +61,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     int mDisplayRotate;
     int mViewWidth;
     int mViewHeight;
+    ArrayList<String> res = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +160,10 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
             //退出相机界面 释放资源
             case R.id.camera_close:
+                Intent intent = new Intent();
+                intent.putExtra("src", res);
+                setResult(1, intent);
+
                 finish();
                 break;
 
@@ -261,9 +268,13 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 //String img_path = getExternalFilesDir(Environment.DIRECTORY_DCIM).getPath() +
                 //        File.separator + System.currentTimeMillis() + ".jpeg";
 
-                String img_path = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".jpg";
+                String img_path_tmp = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis();
+                String img_path = img_path_tmp + ".jpg";
+                String img_path_t = img_path_tmp + "_t.jpg";
 
                 BitmapUtils.saveJPGE_After(context, saveBitmap, img_path, 100);
+                BitmapUtils.saveJPGE_After(context, saveBitmap, img_path_t, 20);
+                res.add(img_path);
 
                 if (!bitmap.isRecycled()) {
                     bitmap.recycle();

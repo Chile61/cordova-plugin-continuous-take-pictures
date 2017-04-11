@@ -18,9 +18,9 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.apache.cordova.PermissionHelper;
 
+import java.util.ArrayList;
+
 /**
- *
- *
  * @sa https://github.com/apache/cordova-android/blob/master/framework/src/org/apache/cordova/CordovaPlugin.java
  */
 public class ContinuousTakePictures extends CordovaPlugin {
@@ -83,9 +83,9 @@ public class ContinuousTakePictures extends CordovaPlugin {
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
-                Intent intent = new Intent(that.cordova.getActivity().getApplicationContext(),CameraActivity.class);
-                intent.putExtra("hi","");
-                that.cordova.startActivityForResult(that,intent,1);
+                Intent intent = new Intent(that.cordova.getActivity().getApplicationContext(), CameraActivity.class);
+                intent.putExtra("hi", "");
+                that.cordova.startActivityForResult(that, intent, 1);
             }
         });
     }
@@ -100,19 +100,19 @@ public class ContinuousTakePictures extends CordovaPlugin {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (resultCode == Activity.RESULT_CANCELED) {
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("", "");
-            } catch (JSONException e) {
-                Log.d(LOG_TAG, "This should never happen");
-            }
-            //this.success(new PluginResult(PluginResult.Status.OK, obj), this.callback);
-            this.callbackContext.success(obj);
-        } else {
-            //this.error(new PluginResult(PluginResult.Status.ERROR), this.callback);
-            this.callbackContext.error("Unexpected error");
+
+        JSONObject obj = new JSONObject();
+        try {
+            ArrayList<String> res = intent.getStringArrayListExtra("src");
+            obj.put("src1", "111");
+            JSONArray jsonArray = new JSONArray(res);
+
+            obj.putOpt("src", jsonArray);
+        } catch (JSONException e) {
+            Log.d(LOG_TAG, "This should never happen");
         }
+        //this.success(new PluginResult(PluginResult.Status.OK, obj), this.callback);
+        this.callbackContext.success(obj);
     }
 
 
