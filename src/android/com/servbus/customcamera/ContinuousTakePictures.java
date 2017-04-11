@@ -104,7 +104,7 @@ public class ContinuousTakePictures extends CordovaPlugin {
         JSONObject obj = new JSONObject();
         try {
             ArrayList<String> res = intent.getStringArrayListExtra("src");
-            obj.put("src1", "111");
+
             JSONArray jsonArray = new JSONArray(res);
 
             obj.putOpt("src", jsonArray);

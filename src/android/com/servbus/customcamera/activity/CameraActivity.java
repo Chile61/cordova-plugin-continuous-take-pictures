@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import io.cordova.myappb6ea24.R;    //插件安装完成之后，会使用hooks替换成对应的包
 
@@ -63,6 +64,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     int mViewHeight;
     ArrayList<String> res = new ArrayList<String>();
 
+    private TextView picCount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +87,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 return true;
             }
         });
+
+        picCount = (TextView) findViewById(R.id.picCount);
 
         mHolder = surfaceView.getHolder();
         mHolder.addCallback(this);
@@ -160,11 +165,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
             //退出相机界面 释放资源
             case R.id.camera_close:
-                Intent intent = new Intent();
-                intent.putExtra("src", res);
-                setResult(1, intent);
 
-                finish();
+                returnData();
                 break;
 
             //闪光灯
@@ -276,6 +278,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 BitmapUtils.saveJPGE_After(context, saveBitmap, img_path_t, 20);
                 res.add(img_path);
 
+                picCount.setText(res.size() + "");
                 if (!bitmap.isRecycled()) {
                     bitmap.recycle();
                 }
@@ -450,4 +453,17 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         return x;
     }
 
+    @Override
+    public void onBackPressed() {
+        returnData();
+        super.onBackPressed();
+    }
+
+    private void returnData(){
+        Intent intent = new Intent();
+        intent.putExtra("src", res);
+        setResult(1, intent);
+
+        finish();
+    }
 }
