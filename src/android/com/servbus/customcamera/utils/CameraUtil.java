@@ -36,8 +36,7 @@ public class CameraUtil {
     }
 
 
-
-    public int getRecorderRotation(int cameraId){
+    public int getRecorderRotation(int cameraId) {
         android.hardware.Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
@@ -75,7 +74,7 @@ public class CameraUtil {
      * @param camera
      */
     public void setCameraDisplayOrientation(Activity activity,
-                                                   int cameraId, Camera camera) {
+                                            int cameraId, Camera camera) {
         android.hardware.Camera.CameraInfo info =
                 new android.hardware.Camera.CameraInfo();
         android.hardware.Camera.getCameraInfo(cameraId, info);
@@ -83,10 +82,18 @@ public class CameraUtil {
                 .getRotation();
         int degrees = 0;
         switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
         }
 
         int result;
@@ -113,7 +120,7 @@ public class CameraUtil {
      * @param angle 旋转角度
      * @return bitmap 图片
      */
-    public  Bitmap rotaingImageView(int id, int angle, Bitmap bitmap) {
+    public Bitmap rotaingImageView(int id, int angle, Bitmap bitmap) {
         //旋转图片 动作
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
@@ -191,7 +198,7 @@ public class CameraUtil {
             i++;
         }
         if (i == list.size()) {
-            i = 0;//如果没找到，就选最小的size
+            i = list.size() - 1;//如果没找到，就选最大的size
         }
         return list.get(i);
     }
