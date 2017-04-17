@@ -105,6 +105,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
         img_picThumbnail = (ImageView) findViewById(R.id.img_picThumbnail);
         img_picThumbnail.setAlpha(0.8f);
+        img_picThumbnail.setOnClickListener(this);
 
 
         //关闭相机界面按钮
@@ -178,6 +179,9 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
             case R.id.camera_close:
                 finish();
                 //returnData();
+                break;
+            case R.id.img_picThumbnail:
+                finish();
                 break;
 
             //闪光灯
@@ -390,10 +394,10 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 //        }
 
         //这里第三个参数为最小尺寸 getPropPreviewSize方法会对从最小尺寸开始升序排列 取出所有支持尺寸的最小尺寸
-        Camera.Size previewSize = CameraUtil.getInstance().getPropSizeForHeight(parameters.getSupportedPreviewSizes(), 800);
+        Camera.Size previewSize = CameraUtil.getInstance().getPropSizeForHeight(parameters.getSupportedPreviewSizes(), 750);
         parameters.setPreviewSize(previewSize.width, previewSize.height);
 
-        Camera.Size pictrueSize = CameraUtil.getInstance().getPropSizeForHeight(parameters.getSupportedPictureSizes(), 800);
+        Camera.Size pictrueSize = CameraUtil.getInstance().getPropSizeForHeight(parameters.getSupportedPictureSizes(), 750);
         parameters.setPictureSize(pictrueSize.width, pictrueSize.height);
 
         camera.setParameters(parameters);
