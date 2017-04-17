@@ -52,7 +52,7 @@
       </feature>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <activity android:name=".activity.CameraActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
+      <activity android:name="com.servbus.customcamera.activity.CameraActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.CAMERA"/>
