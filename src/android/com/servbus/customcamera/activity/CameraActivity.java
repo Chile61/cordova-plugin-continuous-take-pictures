@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.ThumbnailUtils;
@@ -15,6 +19,12 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -104,7 +114,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         img_camera.setOnClickListener(this);
 
         img_picThumbnail = (ImageView) findViewById(R.id.img_picThumbnail);
-        img_picThumbnail.setAlpha(0.8f);
+//        img_picThumbnail.setAlpha(0.8f);
         img_picThumbnail.setOnClickListener(this);
 
 
@@ -156,23 +166,23 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.img_camera:
-                if (isview) {
-                    switch (light_num) {
-                        case 0:
-                            //关闭
-                            CameraUtil.getInstance().turnLightOff(mCamera);
-                            break;
-                        case 1:
-                            CameraUtil.getInstance().turnLightOn(mCamera);
-                            break;
-                        case 2:
-                            //自动
-                            CameraUtil.getInstance().turnLightAuto(mCamera);
-                            break;
-                    }
-                    captrue();
-                    isview = false;
+//                if (isview) {
+                switch (light_num) {
+                    case 0:
+                        //关闭
+                        CameraUtil.getInstance().turnLightOff(mCamera);
+                        break;
+                    case 1:
+                        CameraUtil.getInstance().turnLightOn(mCamera);
+                        break;
+                    case 2:
+                        //自动
+                        CameraUtil.getInstance().turnLightAuto(mCamera);
+                        break;
                 }
+                captrue();
+//                    isview = false;
+//                }
                 break;
 
             //退出相机界面 释放资源
@@ -271,26 +281,6 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         }
     }
 
-    /**
-     * Figure out what ratio we can load our image into memory at while still being bigger than
-     * our desired width and height
-     *
-     * @param srcWidth
-     * @param srcHeight
-     * @param dstWidth
-     * @param dstHeight
-     * @return
-     */
-    public static int calculateSampleSize(int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
-        final float srcAspect = (float) srcWidth / (float) srcHeight;
-        final float dstAspect = (float) dstWidth / (float) dstHeight;
-
-        if (srcAspect > dstAspect) {
-            return srcWidth / dstWidth;
-        } else {
-            return srcHeight / dstHeight;
-        }
-    }
 
     /**
      * 根据指定的图像路径和大小来获取缩略图
@@ -335,6 +325,34 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         return bitmap;
     }
 
+    /**
+     * 获取圆形图片方法
+     *
+     * @param bitmap
+     * @return Bitmap
+     * @author caizhiming
+     */
+    private Bitmap getCircleBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        Paint paint = new Paint();
+
+        final int color = 0xff424242;
+
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        int x = bitmap.getWidth();
+
+        canvas.drawCircle(x / 2, x / 2, x / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return output;
+
+
+    }
 
     private void captrue() {
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
@@ -348,7 +366,28 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
                 //String img_path = getExternalFilesDir(Environment.DIRECTORY_DCIM).getPath() +
                 //        File.separator + System.currentTimeMillis() + ".jpeg";
+//                releaseCamera();
+//                surfaceView.setVisibility(View.INVISIBLE);
+//                ImageView imageView = (ImageView) findViewById(R.id.imageView);
+//                imageView.setImageBitmap(saveBitmap);
+//                Animation loadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+//                long duration = 300;
+//                ScaleAnimation scaleAnimation = new ScaleAnimation(1f, 0f, 1f, 0f);
+//                Animation scaleAnimation = new ScaleAnimation(1f, 0f, 1f, 0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//                TranslateAnimation translateAnimation = new TranslateAnimation(0, -500, 0, 700);
+//                scaleAnimation.setDuration(duration);
+//                translateAnimation.setDuration(duration);
+//
+//                AnimationSet loadAnimation = new AnimationSet(false);
+//                loadAnimation.addAnimation(scaleAnimation);
+//                loadAnimation.addAnimation(translateAnimation);
+//                loadAnimation.setDuration(duration);
 
+//                imageView.startAnimation(loadAnimation);
+//                Animation loadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
+                AlphaAnimation alphaAnimation=new AlphaAnimation(1,0);
+                alphaAnimation.setDuration(10);
+                surfaceView.startAnimation(alphaAnimation);
                 String img_path_tmp = Environment.getExternalStorageDirectory() + "/0tmp/" + System.currentTimeMillis();
                 String img_path = img_path_tmp + ".jpg";
                 String img_path_t = img_path_tmp + "_t.jpg";
@@ -357,12 +396,19 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 Bitmap bitmap_t = getImageThumbnail(img_path, 200, 200);
                 BitmapUtils.saveJPGE_After(context, bitmap_t, img_path_t, 100);
 
-                res.add(img_path);
+                //res.add(img_path);
+//                Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+                ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                scaleAnimation.setDuration(400);
+                img_picThumbnail.startAnimation(scaleAnimation);
 
                 returnData(img_path);
-                img_picThumbnail.setImageBitmap(bitmap_t);
+                Bitmap bitmap_c = getCircleBitmap(bitmap_t);
 
-                picCount.setText(res.size() + "");
+                img_picThumbnail.setImageBitmap(bitmap_c);
+
+
+//                picCount.setText(res.size() + "");
                 if (!bitmap.isRecycled()) {
                     bitmap.recycle();
                 }
@@ -370,8 +416,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 if (!saveBitmap.isRecycled()) {
                     saveBitmap.recycle();
                 }
-
-                startPreview(mCamera, mHolder);
+                mCamera.startPreview();
+//                startPreview(mCamera, mHolder);
 
 
                 //这里打印宽高 就能看到 CameraUtil.getInstance().getPropPictureSize(parameters.getSupportedPictureSizes(), 200);
