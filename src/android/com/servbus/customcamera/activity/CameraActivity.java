@@ -14,6 +14,7 @@ import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -55,7 +56,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     //屏幕宽高
     private int screenWidth;
     private int screenHeight;
-//    private LinearLayout home_custom_top_relative;
+    //    private LinearLayout home_custom_top_relative;
     private ImageView flash_light;
 
     //底部高度 主要是计算切换正方形时的动画高度
@@ -118,7 +119,6 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         //top 的view
 //        home_custom_top_relative = (LinearLayout) findViewById(R.id.home_custom_top_relative);
 //        home_custom_top_relative.setAlpha(0.5f);
-
 
 
         //闪光灯
@@ -345,28 +345,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 Bitmap saveBitmap = CameraUtil.getInstance().setTakePicktrueOrientation(mCameraId, bitmap);
 
-                //String img_path = getExternalFilesDir(Environment.DIRECTORY_DCIM).getPath() +
-                //        File.separator + System.currentTimeMillis() + ".jpeg";
-//                releaseCamera();
-//                surfaceView.setVisibility(View.INVISIBLE);
-//                ImageView imageView = (ImageView) findViewById(R.id.imageView);
-//                imageView.setImageBitmap(saveBitmap);
-//                Animation loadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
-//                long duration = 300;
-//                ScaleAnimation scaleAnimation = new ScaleAnimation(1f, 0f, 1f, 0f);
-//                Animation scaleAnimation = new ScaleAnimation(1f, 0f, 1f, 0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                TranslateAnimation translateAnimation = new TranslateAnimation(0, -500, 0, 700);
-//                scaleAnimation.setDuration(duration);
-//                translateAnimation.setDuration(duration);
-//
-//                AnimationSet loadAnimation = new AnimationSet(false);
-//                loadAnimation.addAnimation(scaleAnimation);
-//                loadAnimation.addAnimation(translateAnimation);
-//                loadAnimation.setDuration(duration);
-
-//                imageView.startAnimation(loadAnimation);
-//                Animation loadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
-                AlphaAnimation alphaAnimation=new AlphaAnimation(1,0);
+                AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
                 alphaAnimation.setDuration(10);
                 surfaceView.startAnimation(alphaAnimation);
                 String img_path_tmp = Environment.getExternalStorageDirectory() + "/0tmp/" + System.currentTimeMillis();
@@ -377,8 +356,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 Bitmap bitmap_t = getImageThumbnail(img_path, 200, 200);
                 BitmapUtils.saveJPGE_After(context, bitmap_t, img_path_t, 100);
 
-                //res.add(img_path);
-//                Animation scale = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+
                 ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 scaleAnimation.setDuration(400);
                 img_picThumbnail.startAnimation(scaleAnimation);
@@ -428,10 +406,13 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         parameters.setPictureSize(pictrueSize.width, pictrueSize.height);
 
         camera.setParameters(parameters);
+        LinearLayout bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
+        int height = screenHeight - bottomLayout.getHeight();
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, (screenWidth * pictrueSize.width) / pictrueSize.height);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, height);
         //这里当然可以设置拍照位置 比如居中 我这里就置顶了
-        //params.gravity = Gravity.CENTER;
+        params.gravity = Gravity.CENTER;
+
         surfaceView.setLayoutParams(params);
     }
 
