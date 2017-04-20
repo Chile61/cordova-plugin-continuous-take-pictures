@@ -63,32 +63,14 @@
 
     <resource-file src="src/android/res/layout/activity_camera.xml" target="res/layout/activity_camera.xml" />
 
-    <!--<resource-file src="src/android/res/values/styles.xml" target="res/values/styles.xml" />-->
-    <resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
-    <resource-file src="src/android/res/values/dimens.xml" target="res/values/dimens.xml" />
 
-    <resource-file src="src/android/res/drawable/btn_camera_close_n.png" target="res/drawable/btn_camera_close_n.png" />
-    <resource-file src="src/android/res/drawable/btn_video_shutter_h.png" target="res/drawable/btn_video_shutter_h.png" />
-    <resource-file src="src/android/res/drawable/btn_video_shutter_n.png" target="res/drawable/btn_video_shutter_n.png" />
-    <resource-file src="src/android/res/drawable/img_homepage_camera5.png" target="res/drawable/img_homepage_camera5.png" />
-    <resource-file src="src/android/res/drawable/img_refresh_smallgrey.png" target="res/drawable/img_refresh_smallgrey.png" />
-    <resource-file src="src/android/res/drawable/progress_backround.xml" target="res/drawable/progress_backround.xml" />
-    <resource-file src="src/android/res/drawable/selector_btn_camera_close1.xml" target="res/drawable/selector_btn_camera_close1.xml" />
-    <resource-file src="src/android/res/drawable/selector_btn_flash_light.xml" target="res/drawable/selector_btn_flash_light.xml" />
-    <resource-file src="src/android/res/drawable/selector_video_shutter.xml" target="res/drawable/selector_video_shutter.xml" />
-
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_close.png" target="res/drawable-hdpi/btn_camera_close.png" />
+    <resource-file src="src/android/res/drawable-hdpi/btn_camera.png" target="res/drawable-hdpi/btn_camera.png" />
     <resource-file src="src/android/res/drawable-hdpi/btn_camera_flash_auto.png" target="res/drawable-hdpi/btn_camera_flash_auto.png" />
     <resource-file src="src/android/res/drawable-hdpi/btn_camera_flash_off.png" target="res/drawable-hdpi/btn_camera_flash_off.png" />
     <resource-file src="src/android/res/drawable-hdpi/btn_camera_flash_on.png" target="res/drawable-hdpi/btn_camera_flash_on.png" />
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_size1_n.png" target="res/drawable-hdpi/btn_camera_size1_n.png" />
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_size2_n.png" target="res/drawable-hdpi/btn_camera_size2_n.png" />
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_0.png" target="res/drawable-hdpi/btn_camera_timing_0.png" />
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_10.png" target="res/drawable-hdpi/btn_camera_timing_10.png" />
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_3.png" target="res/drawable-hdpi/btn_camera_timing_3.png" />
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_timing_5.png" target="res/drawable-hdpi/btn_camera_timing_5.png" />
-    <resource-file src="src/android/res/drawable-hdpi/btn_camera_turn_n.png" target="res/drawable-hdpi/btn_camera_turn_n.png" />
-    
+    <resource-file src="src/android/res/drawable-hdpi/btn_ok.png" target="res/drawable-hdpi/btn_ok.png" />
+    <resource-file src="src/android/res/drawable-hdpi/image_default.png" target="res/drawable-hdpi/image_default.png" />
+
 
 
     <dependency id="cordova-plugin-compat" version="^1.0.0"/>

@@ -55,11 +55,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     //屏幕宽高
     private int screenWidth;
     private int screenHeight;
-    private LinearLayout home_custom_top_relative;
-    private View homeCustom_cover_top_view;
-    private View homeCustom_cover_bottom_view;
-    private View home_camera_cover_top_view;
-    private View home_camera_cover_bottom_view;
+//    private LinearLayout home_custom_top_relative;
     private ImageView flash_light;
 
     //底部高度 主要是计算切换正方形时的动画高度
@@ -77,9 +73,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     int mDisplayRotate;
     int mViewWidth;
     int mViewHeight;
-    ArrayList<String> res = new ArrayList<String>();
 
-    private TextView picCount;
 
     public static CallbackContext callbackContext;
 
@@ -105,7 +99,6 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
             }
         });
 
-        picCount = (TextView) findViewById(R.id.picCount);
 
         mHolder = surfaceView.getHolder();
         mHolder.addCallback(this);
@@ -123,28 +116,16 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         camera_close.setOnClickListener(this);
 
         //top 的view
-        home_custom_top_relative = (LinearLayout) findViewById(R.id.home_custom_top_relative);
-        home_custom_top_relative.setAlpha(0.5f);
+//        home_custom_top_relative = (LinearLayout) findViewById(R.id.home_custom_top_relative);
+//        home_custom_top_relative.setAlpha(0.5f);
 
 
-        //切换正方形时候的动画
-        homeCustom_cover_top_view = findViewById(R.id.homeCustom_cover_top_view);
-        homeCustom_cover_bottom_view = findViewById(R.id.homeCustom_cover_bottom_view);
-
-        homeCustom_cover_top_view.setAlpha(0.5f);
-        homeCustom_cover_bottom_view.setAlpha(0.5f);
-
-        //拍照时动画
-        home_camera_cover_top_view = findViewById(R.id.home_camera_cover_top_view);
-        home_camera_cover_bottom_view = findViewById(R.id.home_camera_cover_bottom_view);
-        home_camera_cover_top_view.setAlpha(1);
-        home_camera_cover_bottom_view.setAlpha(1);
 
         //闪光灯
         flash_light = (ImageView) findViewById(R.id.flash_light);
         flash_light.setOnClickListener(this);
 
-        homecamera_bottom_relative = (RelativeLayout) findViewById(R.id.homecamera_bottom_relative);
+//        homecamera_bottom_relative = (RelativeLayout) findViewById(R.id.homecamera_bottom_relative);
     }
 
     private void initData() {
@@ -159,7 +140,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         //这里相机取景框我这是为宽高比3:4 所以限制底部控件的高度是剩余部分
         RelativeLayout.LayoutParams bottomParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, menuPopviewHeight);
         bottomParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        homecamera_bottom_relative.setLayoutParams(bottomParam);
+//        homecamera_bottom_relative.setLayoutParams(bottomParam);
     }
 
     @Override

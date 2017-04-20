@@ -43,10 +43,10 @@ ContinuousTakePictures.prototype.takePictures = function (successCallback, error
         return;
     }
 
-    if (takePicturesInProgress) {
-        errorCallback('TakePictures is already in progress');
-        return;
-    }
+    // if (takePicturesInProgress) {
+    //     errorCallback('TakePictures is already in progress');
+    //     return;
+    // }
 
     takePicturesInProgress = true;
 
