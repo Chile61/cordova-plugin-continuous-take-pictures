@@ -11,6 +11,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.view.Surface;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -201,6 +202,19 @@ public class CameraUtil {
             i = list.size() - 1;//如果没找到，就选最大的size
         }
         return list.get(i);
+    }
+
+    public Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes) {
+        Collections.sort(sizes, new CameraAscendSizeComparatorForHeight());
+
+        ArrayList<Size> tmp = new ArrayList<Camera.Size>();
+
+        for (Camera.Size size : sizes) {
+            if (size.width * 1.0 / size.height == 4.0 / 3 && size.height <= 1200) {
+                tmp.add(size);
+            }
+        }
+        return tmp.get(tmp.size() - 1);
     }
 
     //升序 按照高度

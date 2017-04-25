@@ -44,6 +44,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CameraActivity extends Activity implements SurfaceHolder.Callback, View.OnClickListener {
@@ -83,9 +84,13 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         context = this;
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        screenWidth = dm.widthPixels;
+        screenHeight = dm.heightPixels;
+
         initView();
-        initData();
     }
+
 
     private void initView() {
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
@@ -126,22 +131,30 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         flash_light.setOnClickListener(this);
 
 //        homecamera_bottom_relative = (RelativeLayout) findViewById(R.id.homecamera_bottom_relative);
-    }
 
-    private void initData() {
-        DisplayMetrics dm = context.getResources().getDisplayMetrics();
-        screenWidth = dm.widthPixels;
-        screenHeight = dm.heightPixels;
+        //设置取景框比例为4：3，程序为竖屏显示，所以高大于宽
+        LinearLayout bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
+        ViewGroup.LayoutParams params = surfaceView.getLayoutParams();
+        int height = screenHeight - bottomLayout.getLayoutParams().height;
+        int width = screenWidth;
+
+        int tmpHeight = (int) (4 * 1.0 / 3 * width);
+        if (tmpHeight > height) {
+            width = (int) (height / (4 * 1.0 / 3));
+        } else {
+            height = tmpHeight;
+        }
+        params.height = height;
+        params.width = width;
+        surfaceView.setLayoutParams(params);
+
+
         mViewWidth = surfaceView.getWidth();
         mViewHeight = surfaceView.getHeight();
 
-        menuPopviewHeight = screenHeight - screenWidth * 4 / 3;
 
-        //这里相机取景框我这是为宽高比3:4 所以限制底部控件的高度是剩余部分
-        RelativeLayout.LayoutParams bottomParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, menuPopviewHeight);
-        bottomParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-//        homecamera_bottom_relative.setLayoutParams(bottomParam);
     }
+
 
     @Override
     public void onClick(View v) {
@@ -367,7 +380,6 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                 img_picThumbnail.setImageBitmap(bitmap_c);
 
 
-//                picCount.setText(res.size() + "");
                 if (!bitmap.isRecycled()) {
                     bitmap.recycle();
                 }
@@ -392,28 +404,13 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
      */
     private void setupCamera(Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
-
-//        if (parameters.getSupportedFocusModes().contains(
-//                Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-//            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-//        }
-
-        //这里第三个参数为最小尺寸 getPropPreviewSize方法会对从最小尺寸开始升序排列 取出所有支持尺寸的最小尺寸
-        Camera.Size previewSize = CameraUtil.getInstance().getPropSizeForHeight(parameters.getSupportedPreviewSizes(), 750);
-        parameters.setPreviewSize(previewSize.width, previewSize.height);
-
-        Camera.Size pictrueSize = CameraUtil.getInstance().getPropSizeForHeight(parameters.getSupportedPictureSizes(), 750);
+        //取4：3的尺寸
+        Camera.Size optionSize = CameraUtil.getInstance().getOptimalPreviewSize(parameters.getSupportedPreviewSizes());
+        parameters.setPreviewSize(optionSize.width, optionSize.height);
+        Camera.Size pictrueSize = CameraUtil.getInstance().getOptimalPreviewSize(parameters.getSupportedPictureSizes());
         parameters.setPictureSize(pictrueSize.width, pictrueSize.height);
-
         camera.setParameters(parameters);
-        LinearLayout bottomLayout = (LinearLayout) findViewById(R.id.bottomLayout);
-        int height = screenHeight - bottomLayout.getHeight();
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, height);
-        //这里当然可以设置拍照位置 比如居中 我这里就置顶了
-        params.gravity = Gravity.CENTER;
-
-        surfaceView.setLayoutParams(params);
     }
 
     /**
