@@ -38,6 +38,7 @@ import com.servbus.customcamera.utils.BitmapUtils;
 import com.servbus.customcamera.utils.CameraUtil;
 
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,6 +79,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
 
     public static CallbackContext callbackContext;
+    public static CordovaInterface cordova;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -351,42 +353,51 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     private void captrue() {
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
+            public void onPictureTaken(final byte[] data, Camera camera) {
                 isview = false;
-                //将data 转换为位图 或者你也可以直接保存为文件使用 FileOutputStream
-                //这里我相信大部分都有其他用处把 比如加个水印 后续再讲解
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                Bitmap saveBitmap = CameraUtil.getInstance().setTakePicktrueOrientation(mCameraId, bitmap);
-
-                AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-                alphaAnimation.setDuration(10);
-                surfaceView.startAnimation(alphaAnimation);
-                String img_path_tmp = Environment.getExternalStorageDirectory() + "/0tmp/" + System.currentTimeMillis();
-                String img_path = img_path_tmp + ".jpg";
-                String img_path_t = img_path_tmp + "_t.jpg";
-                BitmapUtils.saveJPGE_After(context, saveBitmap, img_path, 100);
-
-                Bitmap bitmap_t = getImageThumbnail(img_path, 200, 200);
-                BitmapUtils.saveJPGE_After(context, bitmap_t, img_path_t, 100);
 
 
-                ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                scaleAnimation.setDuration(400);
-                img_picThumbnail.startAnimation(scaleAnimation);
+                cordova.getActivity().runOnUiThread(new Runnable() {
 
-                returnData(img_path);
-                Bitmap bitmap_c = getCircleBitmap(bitmap_t);
+                    @Override
+                    public void run() {
+                        AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+                        alphaAnimation.setDuration(100);
+                        surfaceView.startAnimation(alphaAnimation);
 
-                img_picThumbnail.setImageBitmap(bitmap_c);
+                        //将data 转换为位图 或者你也可以直接保存为文件使用 FileOutputStream
+                        //这里我相信大部分都有其他用处把 比如加个水印 后续再讲解
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        Bitmap saveBitmap = CameraUtil.getInstance().setTakePicktrueOrientation(mCameraId, bitmap);
 
 
-                if (!bitmap.isRecycled()) {
-                    bitmap.recycle();
-                }
+                        String img_path_tmp = Environment.getExternalStorageDirectory() + "/0tmp/" + System.currentTimeMillis();
+                        String img_path = img_path_tmp + ".jpg";
+                        String img_path_t = img_path_tmp + "_t.jpg";
+                        BitmapUtils.saveJPGE_After(context, saveBitmap, img_path, 100);
 
-                if (!saveBitmap.isRecycled()) {
-                    saveBitmap.recycle();
-                }
+
+                        ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                        scaleAnimation.setDuration(400);
+                        img_picThumbnail.startAnimation(scaleAnimation);
+
+                        Bitmap bitmap_t = getImageThumbnail(img_path, 200, 200);
+                        BitmapUtils.saveJPGE_After(context, bitmap_t, img_path_t, 100);
+                        returnData(img_path);
+                        Bitmap bitmap_c = getCircleBitmap(bitmap_t);
+
+                        img_picThumbnail.setImageBitmap(bitmap_c);
+                        if (!bitmap.isRecycled()) {
+                            bitmap.recycle();
+                        }
+
+                        if (!saveBitmap.isRecycled()) {
+                            saveBitmap.recycle();
+                        }
+                    }
+                });
+
+
                 mCamera.startPreview();
 //                startPreview(mCamera, mHolder);
 

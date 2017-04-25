@@ -84,8 +84,8 @@ public class ContinuousTakePictures extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 Intent intent = new Intent(that.cordova.getActivity().getApplicationContext(), CameraActivity.class);
-                intent.putExtra("hi", "");
                 CameraActivity.callbackContext = that.callbackContext;
+                CameraActivity.cordova = that.cordova;
                 that.cordova.startActivityForResult(that, intent, 1);
             }
         });
