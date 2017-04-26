@@ -80,6 +80,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
     public static CallbackContext callbackContext;
     public static CordovaInterface cordova;
+    public static String dir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -371,7 +372,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                         Bitmap saveBitmap = CameraUtil.getInstance().setTakePicktrueOrientation(mCameraId, bitmap);
 
 
-                        String img_path_tmp = Environment.getExternalStorageDirectory() + "/0tmp/" + System.currentTimeMillis();
+                        String img_path_tmp = cordova.getActivity().getExternalFilesDir("") + "/" + dir + "/" + System.currentTimeMillis();
                         String img_path = img_path_tmp + ".jpg";
                         String img_path_t = img_path_tmp + "_t.jpg";
                         BitmapUtils.saveJPGE_After(context, saveBitmap, img_path, 100);

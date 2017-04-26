@@ -6,7 +6,7 @@ var takePicturesInProgress = false;
 
 function ContinuousTakePictures() {
 
-    
+
 }
 
 /**
@@ -17,16 +17,9 @@ function ContinuousTakePictures() {
  * @param config
  */
 ContinuousTakePictures.prototype.takePictures = function (successCallback, errorCallback, config) {
+    config = config || {};
 
-    if (config instanceof Array) {
-        // do nothing
-    } else {
-        if (typeof (config) === 'object') {
-            config = [config];
-        } else {
-            config = [];
-        }
-    }
+    var args = [config.dir || ""];
 
     if (errorCallback == null) {
         errorCallback = function () {
@@ -43,25 +36,16 @@ ContinuousTakePictures.prototype.takePictures = function (successCallback, error
         return;
     }
 
-    // if (takePicturesInProgress) {
-    //     errorCallback('TakePictures is already in progress');
-    //     return;
-    // }
-
-    takePicturesInProgress = true;
-
     exec(
         function (result) {
-            takePicturesInProgress = false;
             successCallback(result);
         },
         function (error) {
-            takePicturesInProgress = false;
             errorCallback(error);
         },
         'ContinuousTakePictures',
         'ContinuousTakePictures',
-        config
+        args
     );
 };
 

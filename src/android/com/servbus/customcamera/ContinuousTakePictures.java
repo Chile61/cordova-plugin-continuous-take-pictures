@@ -86,6 +86,11 @@ public class ContinuousTakePictures extends CordovaPlugin {
                 Intent intent = new Intent(that.cordova.getActivity().getApplicationContext(), CameraActivity.class);
                 CameraActivity.callbackContext = that.callbackContext;
                 CameraActivity.cordova = that.cordova;
+                try {
+                    CameraActivity.dir=args.getString(0);//照片存放的getExternalFilesDir 的子目录
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 that.cordova.startActivityForResult(that, intent, 1);
             }
         });
