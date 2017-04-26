@@ -20,7 +20,7 @@ var configobj = JSON.parse(fs.readFileSync(ourconfigfile, 'utf8'));
 // Add java files where you want to add R.java imports in the following array
 
 var filestoreplace = [
-    "platforms/android/src/in/co/geekninja/plugin/SketchActivity.java"
+    "platforms/android/src/com/servbus/customcamera/activity/CameraActivity.java"
 ];
 filestoreplace.forEach(function (val, index, array) {
     if (fs.existsSync(val)) {

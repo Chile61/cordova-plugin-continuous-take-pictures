@@ -38,7 +38,7 @@
     <framework src="AudioToolbox.framework"/>
   </platform>
   <platform name="android">
-    <hook type="after_plugin_install" src="hooks/after_plugin_installhook-add-r-import.js" />
+    <hook type="after_plugin_install" src="hooks/after_plugin_installhook_add_r_import.js" />
 
     <source-file src="src/android/com/servbus/customcamera/ContinuousTakePictures.java" target-dir="src/com/servbus/customcamera"/>
     <source-file src="src/android/com/servbus/customcamera/activity/CameraActivity.java" target-dir="src/com/servbus/customcamera/activity"/>
