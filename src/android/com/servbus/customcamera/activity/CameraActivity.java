@@ -555,14 +555,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     }
 
     private void returnData(String path) {
-        JSONObject obj = new JSONObject();
-        try {
-            obj.put("src", path);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, obj);
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, path);
         //true：回调继续保持，即当前返回后后面还会有返回 false:回调结束，即当这个返回后不会再有返回
         pluginResult.setKeepCallback(true);
         callbackContext.sendPluginResult(pluginResult);
