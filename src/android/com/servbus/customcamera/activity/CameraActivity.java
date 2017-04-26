@@ -163,23 +163,23 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.img_camera:
-//                if (isview) {
-                switch (light_num) {
-                    case 0:
-                        //关闭
-                        CameraUtil.getInstance().turnLightOff(mCamera);
-                        break;
-                    case 1:
-                        CameraUtil.getInstance().turnLightOn(mCamera);
-                        break;
-                    case 2:
-                        //自动
-                        CameraUtil.getInstance().turnLightAuto(mCamera);
-                        break;
+                if (isview) {
+                    switch (light_num) {
+                        case 0:
+                            //关闭
+                            CameraUtil.getInstance().turnLightOff(mCamera);
+                            break;
+                        case 1:
+                            CameraUtil.getInstance().turnLightOn(mCamera);
+                            break;
+                        case 2:
+                            //自动
+                            CameraUtil.getInstance().turnLightAuto(mCamera);
+                            break;
+                    }
+                    captrue();
+                    isview = false;
                 }
-                captrue();
-//                    isview = false;
-//                }
                 break;
 
             //退出相机界面 释放资源
@@ -395,6 +395,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                         if (!saveBitmap.isRecycled()) {
                             saveBitmap.recycle();
                         }
+                        isview = true;
                     }
                 });
 
