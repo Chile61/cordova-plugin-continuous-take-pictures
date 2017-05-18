@@ -13,21 +13,17 @@
   </js-module>
   <platform name="ios">
     <config-file target="config.xml" parent="/*">
-      <feature name="QRCodeScanner">
-        <param name="ios-package" value="HWPQRCodeScanner"/>
+      <feature name="ContinuousTakePictures">
+        <param name="ios-package" value="ContinuousTakePictures"/>
       </feature>
     </config-file>
-    <resource-file src="src/ios/CDVQRCodeScanner.bundle"/>
-    <header-file src="src/ios/Bridging-Header.h"/>
+    
+    <resource-file src="src/ios/Camera.bundle"/>
+    <!--<header-file src="src/ios/Bridging-Header.h"/>-->
 
-    <source-file src="src/ios/QRCodeScannerPlugin.swift"/>
-    <source-file src="src/ios/LBXPermissions.swift"/>
-    <source-file src="src/ios/LBXScanLineAnimation.swift"/>
-    <source-file src="src/ios/LBXScanNetAnimation.swift"/>
-    <source-file src="src/ios/LBXScanView.swift"/>
-    <source-file src="src/ios/LBXScanViewController.swift"/>
-    <source-file src="src/ios/LBXScanViewStyle.swift"/>
-    <source-file src="src/ios/LBXScanWrapper.swift"/>
+    <source-file src="src/ios/ContinuousTakePicturesPlugin.swift"/>
+    <source-file src="src/ios/CameraViewController.swift"/>
+    <source-file src="src/ios/ViewController.swift"/>
 
     <framework src="AVFoundation.framework"/>
     <framework src="AssetsLibrary.framework"/>
@@ -36,6 +32,13 @@
     <framework src="CoreGraphics.framework"/>
     <framework src="CoreImage.framework"/>
     <framework src="AudioToolbox.framework"/>
+
+    <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+      <string></string>
+    </config-file>
+    <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+      <string></string>
+    </config-file>
   </platform>
   <platform name="android">
     <hook type="after_plugin_install" src="hooks/after_plugin_installhook_add_r_import.js" />
