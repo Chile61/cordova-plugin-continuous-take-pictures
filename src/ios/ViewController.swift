@@ -2,25 +2,24 @@
 //  ViewController.swift
 //  PhotoCollector
 //
-//  Created by servbus on 2017/5/11.
+//  Created by servbus on 2017/5/22.
 //  Copyright © 2017年 servbus. All rights reserved.
 //
 
 import UIKit
-import MobileCoreServices
 import AVFoundation
-import Photos
-import AssetsLibrary
 
-
-class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
+class ViewController: UIViewController {
     
-    let picVc = CameraViewController()
+    let captureSession = AVCaptureSession()
+    let stillImageOutput = AVCaptureStillImageOutput()
+    var captureDevice:AVCaptureDevice? = nil
+    var previewLayer:AVCaptureVideoPreviewLayer? = nil
+    let focusView = UIView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
     let btnThumbnail =  UIButton()
-    
     let btnFlashMode = UIButton()
-    
-    open var successCallBack:((String?) -> Void)?
+
+	open var successCallBack:((String?) -> Void)?
     open var cancelCallBack:(() -> Void)?
     open var childDir:String?
     
@@ -33,96 +32,48 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         return .portrait
     }
     
-    
-    func isGetCameraPermission()->Bool
-    {
-        let authStaus = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo);
-        if authStaus != AVAuthorizationStatus.denied
-        {
-            return true
-        }
-        else
-        {
-            return false
-        }
-    }
-    
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        
-        //取消
-        
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        
-        let img=info[UIImagePickerControllerOriginalImage] as! UIImage
-        
-        let timage = img.crop(CGSize(width: 200, height: 200))
-        btnThumbnail.setImage(timage, for: UIControlState.normal)
-        
-        
-        let tmpPath =  NSHomeDirectory()+"/Documents/"+childDir!+"/"+String(Int(Date().timeIntervalSince1970*1000))
-        
-        let imagePath = tmpPath+".jpg"
-        
-        try? UIImageJPEGRepresentation(img, 0.7)?.write(to: URL(fileURLWithPath: imagePath))
-        try? UIImageJPEGRepresentation(timage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_t.jpg"))
-        
-        successCallBack?(imagePath)
-        
-    }
-    func btnCancelAction(_ sender:Any){
-        picVc.dismiss(animated: false)
-        cancelCallBack?()
-    }
-    
-    func btnTakePicAction(_ sender:Any){
-        picVc.takePicture();
-    }
-    
-    func btnFlashModeAction(_ sender:Any){
-        switch picVc.cameraFlashMode {
-        case .auto:
-            picVc.cameraFlashMode = .on
-            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_on"), for: .normal)
-        case .on:
-            picVc.cameraFlashMode = .off
-            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_off"), for: .normal)
-        case .off:
-            picVc.cameraFlashMode = .auto
-            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_auto"), for: .normal)
-        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        if picVc.isBeingDismissed == true {
-            return
-        }
-        
-        if isGetCameraPermission() == false{
-            let cv=UIAlertController(title: "提示", message: "未获得授权使用摄像头，请在设置中打开", preferredStyle: .alert);
-            let okAction=UIAlertAction(title: "设置", style: .default, handler: {
-                action in
-                UIApplication.shared.openURL(URL(string:UIApplicationOpenSettingsURLString)!)
-            });
-            let cancelAction=UIAlertAction(title: "取消", style: .cancel, handler: nil);
-            cv.addAction(okAction);
-            cv.addAction(cancelAction);
-            self.present(cv, animated: false);
-            
-            return
-        }
-        //1.判断照片控制器是否可用 ,不可用返回
 
-        //2.创建照片控制器
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
         
-        //3.设置控制器类型
-        picVc.sourceType = .camera
-        picVc.mediaTypes = [kUTTypeImage as String]
-        //4.设置是否可以管理已经存在的图片或者视频
-        picVc.allowsEditing = false
-        picVc.showsCameraControls=false;
+        
+        let devices = AVCaptureDevice.devices().filter{ ($0 as AnyObject).hasMediaType(AVMediaTypeVideo) && ($0 as AnyObject).position == AVCaptureDevicePosition.back }
+        captureDevice = devices.first as? AVCaptureDevice
+        if (captureDevice?.isFlashModeSupported(.auto))!{
+            try? captureDevice?.lockForConfiguration()
+            captureDevice?.flashMode = .auto
+            captureDevice?.unlockForConfiguration()
+        }
+        
+        
+        captureSession.addInput(try? AVCaptureDeviceInput(device: captureDevice))
+        captureSession.sessionPreset = AVCaptureSessionPresetPhoto
+        captureSession.startRunning()
+        stillImageOutput.outputSettings = [AVVideoCodecKey:AVVideoCodecJPEG]
+        if captureSession.canAddOutput(stillImageOutput) {
+            captureSession.addOutput(stillImageOutput)
+        }
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)!
+        let pWidth = view.bounds.size.width;
+        let pHeight = pWidth*(4.0/3.0)
+        previewLayer?.bounds = CGRect(x: 0, y: 0, width: pWidth, height: pHeight)
+        previewLayer?.position = CGPoint(x:(previewLayer?.bounds.midX)!, y:(previewLayer?.bounds.midY)!)
+        previewLayer?.videoGravity = AVLayerVideoGravityResizeAspect
+        
+        //对焦框
+        focusView.layer.borderWidth = 1
+        focusView.layer.borderColor = UIColor.green.cgColor
+        focusView.backgroundColor = UIColor.clear
+        focusView.isHidden = true
+        
+        let cameraPreview = UIView(frame: CGRect(x:0.0, y:0, width:view.bounds.size.width, height:view.bounds.size.height))
+        cameraPreview.layer.addSublayer(previewLayer!)
+        cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(saveToCamera)))
+        
+        
         
         let btnTakePicture = UIButton()
         
@@ -160,37 +111,138 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         bottomItemsView.addSubview(btnCancel)
         
         
-        
-        let cov = UIView(frame:CGRect( origin:CGPoint(x:0.0, y:0), size:CGSize(width:self.view.frame.size.width, height:self.view.frame.size.height) ) )
-        
-        cov.addSubview(bottomItemsView)
-        
-        //闪光灯控制
+        //闪光灯
         btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_auto"), for: .normal)
         
         btnFlashMode.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
         btnFlashMode.center = CGPoint(x: self.view.frame.width-btnFlashMode.bounds.width/2-20, y: btnFlashMode.bounds.height/2 + 20)
         btnFlashMode.addTarget(self, action: #selector(btnFlashModeAction), for: .touchUpInside)
         
-        cov.addSubview(btnFlashMode)
         
-        picVc.cameraOverlayView=cov;
+        cameraPreview.addSubview(focusView)
+        cameraPreview.addSubview(bottomItemsView)
+        cameraPreview.addSubview(btnFlashMode)
+        view.addSubview(cameraPreview)
         
-        //5.设置代理
-        picVc.delegate = self
         
-        //6.弹出控制器
-		present(picVc, animated: false)
+    }
+    
+    func saveToCamera(sender: UITapGestureRecognizer) {
+        
+        let point =   sender.location(in: self.view)
+        
+        let cp =  self.previewLayer?.captureDevicePointOfInterest(for: point)
+        if (cp?.x)! > CGFloat(1){
+            return
+        }
+        
+        try? self.captureDevice?.lockForConfiguration()
+        if (self.captureDevice?.isFocusModeSupported(.autoFocus))!{
+            
+            self.captureDevice?.focusPointOfInterest = cp!
+            self.captureDevice?.focusMode = .autoFocus
+        }
+        if (self.captureDevice?.isExposureModeSupported(.autoExpose))!{
+            self.captureDevice?.exposurePointOfInterest = cp!
+            self.captureDevice?.exposureMode = .autoExpose
+        }
+        self.captureDevice?.unlockForConfiguration()
+        focusView.center = point
+        focusView.isHidden = false
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.focusView.transform = CGAffineTransform(scaleX: 1.25, y: 1.25)
+        }) { (finished) in
+            UIView.animate(withDuration: 0.5, animations: {
+                self.focusView.transform = CGAffineTransform(scaleX: 1, y: 1)
+            }, completion: { (f) in
+                self.focusView.isHidden = true
+            })
+        }
+        
+        
+        
+    }
+    
+    
+    func btnCancelAction(_ sender:Any){
+        //返回数据
+        cancelCallBack?()
+    }
+    
+    func btnTakePicAction(_ sender:Any){
+        
+        
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.fromValue = 	1
+        animation.toValue = 0
+        animation.duration = 0.3
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        
+        self.previewLayer?.add(animation, forKey: nil)
+        
+        
+        let queue = DispatchQueue(label: "com.servbus.takePhoto")
+        queue.async {
+            if let videoConnection = self.stillImageOutput.connection(withMediaType: AVMediaTypeVideo) {
+                self.stillImageOutput.captureStillImageAsynchronously(from: videoConnection) {
+                    (imageDataSampleBuffer, error) -> Void in
+                    if imageDataSampleBuffer == nil {
+                        return
+                    }
+                    
+                    let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
+                    let img=UIImage(data: imageData!)!
+                    
+                    let timage = img.crop(to: CGSize(width: 200, height: 200))
+                    
+                    self.btnThumbnail.setImage(timage, for: UIControlState.normal)
+                    
+                    
+                    let tmpPath =  NSHomeDirectory()+"/Documents/"+self.childDir!+"/"+String(Int(Date().timeIntervalSince1970*1000))
+                    
+                    let imagePath = tmpPath+".jpg"
+                    
+                    try? UIImageJPEGRepresentation(img, 0.7)?.write(to: URL(fileURLWithPath: imagePath))
+                    try? UIImageJPEGRepresentation(timage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_t.jpg"))
+                    
+                    self.successCallBack?(imagePath)
+                }
+            }
+        }
+        
+        
+        
+    }
+    
+    func btnFlashModeAction(_ sender:Any){
+        
+        try?  self.captureDevice?.lockForConfiguration()
+        switch self.captureDevice!.flashMode {
+        case .auto:
+            self.captureDevice!.flashMode   = .on
+            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_on"), for: .normal)
+        case .on:
+            self.captureDevice!.flashMode = .off
+            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_off"), for: .normal)
+        case .off:
+            self.captureDevice!.flashMode  = .auto
+            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_auto"), for: .normal)
+        }
+        self.captureDevice?.unlockForConfiguration()
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
     }
 }
 
 
 
 
-
 extension UIImage {
     
-    func crop(_ to:CGSize) -> UIImage {
+    func crop(to:CGSize) -> UIImage {
         guard let cgimage = self.cgImage else { return self }
         
         let contextImage: UIImage = UIImage(cgImage: cgimage)
@@ -241,3 +293,4 @@ extension UIImage {
         return resized!
     }
 }
+

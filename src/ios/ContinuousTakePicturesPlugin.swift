@@ -8,7 +8,19 @@ import AVFoundation
     
     @objc(ContinuousTakePictures:)
     func scan(_ command: CDVInvokedUrlCommand) {
-        
+        if isGetCameraPermission() == false{
+            let cv=UIAlertController(title: "提示", message: "未获得授权使用摄像头，请在设置中打开", preferredStyle: .alert);
+            let okAction=UIAlertAction(title: "设置", style: .default, handler: {
+                action in
+                UIApplication.shared.openURL(URL(string:UIApplicationOpenSettingsURLString)!)
+            });
+            let cancelAction=UIAlertAction(title: "取消", style: .cancel, handler: nil);
+            cv.addAction(okAction);
+            cv.addAction(cancelAction);
+            self.viewController?.present(cv, animated: false,completion: nil);
+            
+            return
+        }        
         
         scanCommand=command;
 
@@ -28,5 +40,20 @@ import AVFoundation
     
     func cancelCallBack() -> Void {
 		self.viewController?.dismiss(animated:false, completion: nil)
+    }
+
+
+
+	func isGetCameraPermission()->Bool
+    {
+        let authStaus = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo);
+        if authStaus != AVAuthorizationStatus.denied
+        {
+            return true
+        }
+        else
+        {
+            return false
+        }
     }
 }

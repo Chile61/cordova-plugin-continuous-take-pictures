@@ -19,10 +19,8 @@
     </config-file>
     
     <resource-file src="src/ios/Camera.bundle"/>
-    <!--<header-file src="src/ios/Bridging-Header.h"/>-->
 
     <source-file src="src/ios/ContinuousTakePicturesPlugin.swift"/>
-    <source-file src="src/ios/CameraViewController.swift"/>
     <source-file src="src/ios/ViewController.swift"/>
 
     <framework src="AVFoundation.framework"/>
