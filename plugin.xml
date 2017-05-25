@@ -6,7 +6,8 @@
   <repo>https://github.com/servbus/cordova-plugin-continuous-take-pictures.git</repo>
   <issue>https://github.com/servbus/cordova-plugin-continuous-take-pictures.git/issues</issue>
   <engines>
-    <engine name="cordova" version=">=6.1.1"/>
+    <engine name="cordova" version=">=6.3.1"/>
+    <engine name="cordova-ios" version=">=4.3.1"/>
   </engines>
   <js-module src="www/ContinuousTakePictures.js" name="ContinuousTakePictures">
     <clobbers target="cordova.plugins.ContinuousTakePictures"/>
