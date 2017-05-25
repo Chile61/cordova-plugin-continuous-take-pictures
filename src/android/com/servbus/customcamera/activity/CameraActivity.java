@@ -184,11 +184,10 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
 
             //退出相机界面 释放资源
             case R.id.camera_close:
-                finish();
-                //returnData();
+                cancelClick();
                 break;
             case R.id.img_picThumbnail:
-                finish();
+                cancelClick();
                 break;
 
             //闪光灯
@@ -560,5 +559,11 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         //true：回调继续保持，即当前返回后后面还会有返回 false:回调结束，即当这个返回后不会再有返回
         pluginResult.setKeepCallback(true);
         callbackContext.sendPluginResult(pluginResult);
+    }
+
+    private void cancelClick(){
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK,"");
+        callbackContext.sendPluginResult(pluginResult);
+        finish();
     }
 }

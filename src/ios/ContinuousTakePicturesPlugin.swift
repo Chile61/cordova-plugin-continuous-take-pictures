@@ -39,6 +39,8 @@ import AVFoundation
     }
     
     func cancelCallBack() -> Void {
+		let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK)
+        commandDelegate.send(pluginResult, callbackId:scanCommand!.callbackId)
 		self.viewController?.dismiss(animated:false, completion: nil)
     }
 
