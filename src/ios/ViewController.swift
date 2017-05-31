@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import MediaPlayer
 
 class CustomLine: UIView{
     override func draw(_ rect: CGRect) {
@@ -30,7 +31,7 @@ class CustomLine: UIView{
         context.addLine(to: CGPoint(x: self.frame.size.width - 30, y: self.frame.size.height))   //终点坐标
         
         context.strokePath();
-    
+        
     }
 }
 
@@ -43,8 +44,8 @@ class ViewController: UIViewController {
     let focusView = UIView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
     let btnThumbnail =  UIButton()
     let btnFlashMode = UIButton()
-
-	open var successCallBack:((String?) -> Void)?
+    
+    open var successCallBack:((String?) -> Void)?
     open var cancelCallBack:(() -> Void)?
     open var childDir:String?
     
@@ -57,14 +58,31 @@ class ViewController: UIViewController {
         return .portrait
     }
     
-
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged), name: NSNotification.Name("AVSystemController_SystemVolumeDidChangeNotification"), object: nil)
+        let mpv = MPVolumeView(frame: CGRect(x: -20, y: -20, width: 0, height: 0))
+        mpv.isHidden = false
+        
+        self.view.addSubview(mpv)
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self)
+        
+    }
+    
+    func volumeChanged() -> Void {
+        btnTakePicAction("")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         
-    
+        
+        
         let devices = AVCaptureDevice.devices().filter{ ($0 as AnyObject).hasMediaType(AVMediaTypeVideo) && ($0 as AnyObject).position == AVCaptureDevicePosition.back }
         captureDevice = devices.first as? AVCaptureDevice
         if (captureDevice?.isFlashModeSupported(.auto))!{
@@ -96,7 +114,7 @@ class ViewController: UIViewController {
         
         let cameraPreview = UIView(frame: CGRect(x:0.0, y:0, width:view.bounds.size.width, height:view.bounds.size.height))
         cameraPreview.layer.addSublayer(previewLayer!)
-        cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(saveToCamera)))
+        cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(touchFocus)))
         
         let line = CustomLine()
         line.frame = (previewLayer?.frame)!
@@ -156,7 +174,7 @@ class ViewController: UIViewController {
         
     }
     
-    func saveToCamera(sender: UITapGestureRecognizer) {
+    func touchFocus(sender: UITapGestureRecognizer) {
         
         let point =   sender.location(in: self.view)
         
