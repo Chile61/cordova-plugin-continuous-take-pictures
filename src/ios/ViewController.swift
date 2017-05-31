@@ -9,6 +9,31 @@
 import UIKit
 import AVFoundation
 
+class CustomLine: UIView{
+    override func draw(_ rect: CGRect) {
+        
+        let context = UIGraphicsGetCurrentContext()!
+        
+        context.setLineCap(.round)
+        context.setLineWidth(1);  //线宽
+        context.setAllowsAntialiasing(true);
+        context.setStrokeColor(red: 70.0 / 255.0, green: 241.0 / 255.0, blue: 241.0 / 255.0, alpha: 0.6);  //线的颜色
+        context.beginPath();
+        
+        context.move(to: CGPoint(x: 30, y: 0))   //起点坐标
+        context.addLine(to: CGPoint(x: 30, y: self.frame.size.height))   //终点坐标
+        
+        context.move(to: CGPoint(x: 0, y: 30))   //起点坐标
+        context.addLine(to: CGPoint(x: self.frame.size.width, y: 30))   //终点坐标
+        
+        context.move(to: CGPoint(x: self.frame.size.width - 30, y: 0))   //起点坐标
+        context.addLine(to: CGPoint(x: self.frame.size.width - 30, y: self.frame.size.height))   //终点坐标
+        
+        context.strokePath();
+    
+    }
+}
+
 class ViewController: UIViewController {
     
     let captureSession = AVCaptureSession()
@@ -39,7 +64,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         
-        
+    
         let devices = AVCaptureDevice.devices().filter{ ($0 as AnyObject).hasMediaType(AVMediaTypeVideo) && ($0 as AnyObject).position == AVCaptureDevicePosition.back }
         captureDevice = devices.first as? AVCaptureDevice
         if (captureDevice?.isFlashModeSupported(.auto))!{
@@ -73,6 +98,10 @@ class ViewController: UIViewController {
         cameraPreview.layer.addSublayer(previewLayer!)
         cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(saveToCamera)))
         
+        let line = CustomLine()
+        line.frame = (previewLayer?.frame)!
+        line.backgroundColor = UIColor.clear
+        cameraPreview.addSubview(line)
         
         
         let btnTakePicture = UIButton()
@@ -115,7 +144,7 @@ class ViewController: UIViewController {
         btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_auto"), for: .normal)
         
         btnFlashMode.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
-        btnFlashMode.center = CGPoint(x: self.view.frame.width-btnFlashMode.bounds.width/2-20, y: btnFlashMode.bounds.height/2 + 20)
+        btnFlashMode.center = CGPoint(x: self.view.frame.width-btnFlashMode.bounds.width/2-25, y: btnFlashMode.bounds.height/2 + 25)
         btnFlashMode.addTarget(self, action: #selector(btnFlashModeAction), for: .touchUpInside)
         
         
