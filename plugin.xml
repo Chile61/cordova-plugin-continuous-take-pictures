@@ -64,6 +64,7 @@
     </config-file>
 
     <resource-file src="src/android/res/layout/activity_camera.xml" target="res/layout/activity_camera.xml" />
+	<resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
 
 
     <resource-file src="src/android/res/drawable-hdpi/btn_camera.png" target="res/drawable-hdpi/btn_camera.png" />

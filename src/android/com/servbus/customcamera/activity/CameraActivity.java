@@ -151,6 +151,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         params.width = width;
         surfaceView.setLayoutParams(params);
 
+        FrameLayout customLineLayout = (FrameLayout) findViewById(R.id.customLineLayout);
+        customLineLayout.setLayoutParams(params);
 
         mViewWidth = surfaceView.getWidth();
         mViewHeight = surfaceView.getHeight();
@@ -561,8 +563,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         callbackContext.sendPluginResult(pluginResult);
     }
 
-    private void cancelClick(){
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK,"");
+    private void cancelClick() {
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "");
         callbackContext.sendPluginResult(pluginResult);
         finish();
     }
