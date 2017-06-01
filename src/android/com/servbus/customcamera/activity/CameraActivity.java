@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -94,6 +95,18 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         initView();
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                captrue();
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                captrue();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     private void initView() {
         surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
