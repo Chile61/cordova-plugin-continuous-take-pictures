@@ -12,9 +12,7 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -23,15 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import io.cordova.myappb6ea24.R;    //插件安装完成之后，会使用hooks替换成对应的包
 
@@ -41,12 +35,9 @@ import com.servbus.customcamera.utils.CameraUtil;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.PluginResult;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CameraActivity extends Activity implements SurfaceHolder.Callback, View.OnClickListener {
@@ -67,7 +58,8 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     //闪光灯模式 0:关闭 1: 开启 2: 自动
     private int light_num = 0;
 
-    private boolean isview = false;
+    //正在拍摄照片
+    private boolean isTaking = false;
     private ImageView camera_close;
     private RelativeLayout homecamera_bottom_relative;
     private ImageView img_camera;
@@ -99,10 +91,10 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode){
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                captrue();
+                takePicture();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_UP:
-                captrue();
+                takePicture();
                 return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -178,23 +170,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.img_camera:
-                if (isview) {
-                    switch (light_num) {
-                        case 0:
-                            //关闭
-                            CameraUtil.getInstance().turnLightOff(mCamera);
-                            break;
-                        case 1:
-                            CameraUtil.getInstance().turnLightOn(mCamera);
-                            break;
-                        case 2:
-                            //自动
-                            CameraUtil.getInstance().turnLightAuto(mCamera);
-                            break;
-                    }
-                    captrue();
-                    isview = false;
-                }
+                takePicture();
                 break;
 
             //退出相机界面 释放资源
@@ -242,6 +218,25 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         }
     }
 
+    private void takePicture(){
+        if (isTaking) {
+            switch (light_num) {
+                case 0:
+                    //关闭
+                    CameraUtil.getInstance().turnLightOff(mCamera);
+                    break;
+                case 1:
+                    CameraUtil.getInstance().turnLightOn(mCamera);
+                    break;
+                case 2:
+                    //自动
+                    CameraUtil.getInstance().turnLightAuto(mCamera);
+                    break;
+            }
+            captrue();
+            isTaking = false;
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -286,7 +281,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
             CameraUtil.getInstance().setCameraDisplayOrientation(this, mCameraId, camera);
 //            camera.setDisplayOrientation(90);
             camera.startPreview();
-            isview = true;
+            isTaking = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -369,7 +364,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
         mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
-                isview = false;
+                isTaking = false;
 
 
                 cordova.getActivity().runOnUiThread(new Runnable() {
@@ -409,7 +404,7 @@ public class CameraActivity extends Activity implements SurfaceHolder.Callback, 
                         if (!saveBitmap.isRecycled()) {
                             saveBitmap.recycle();
                         }
-                        isview = true;
+                        isTaking = true;
                     }
                 });
 
