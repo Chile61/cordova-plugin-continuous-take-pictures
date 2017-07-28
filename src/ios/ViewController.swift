@@ -44,6 +44,9 @@ class ViewController: UIViewController {
     let focusView = UIView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
     let btnThumbnail =  UIButton()
     let btnFlashMode = UIButton()
+    var cameraPreview:UIView? = nil;
+    
+    var board:Board!
     
     open var successCallBack:((String?) -> Void)?
     open var cancelCallBack:(() -> Void)?
@@ -77,6 +80,33 @@ class ViewController: UIViewController {
     func volumeChanged() -> Void {
         btnTakePicAction("")
     }
+    
+    // MARK: - touches methods
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        board.lastPoint = nil
+        board.beginPoint = touches.first!.location(in: self.board)
+        board.endPoint = board.beginPoint
+        board.drawingState = .began
+        board.drawingImage()
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        board.endPoint = touches.first!.location(in: self.board)
+        board.drawingState = .moved
+        board.drawingImage()
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        board.endPoint = nil
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        board.endPoint = touches.first!.location(in: self.board)
+        board.drawingState = .ended
+        board.drawingImage()
+    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,14 +142,16 @@ class ViewController: UIViewController {
         focusView.backgroundColor = UIColor.clear
         focusView.isHidden = true
         
-        let cameraPreview = UIView(frame: CGRect(x:0.0, y:0, width:view.bounds.size.width, height:view.bounds.size.height))
-        cameraPreview.layer.addSublayer(previewLayer!)
-        cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(touchFocus)))
+        cameraPreview = UIView(frame: CGRect(x:0.0, y:0, width:view.bounds.size.width, height:view.bounds.size.height))
+        cameraPreview?.layer.addSublayer(previewLayer!)
+        //cameraPreview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(touchFocus)))
+        
+        
         
         let line = CustomLine()
         line.frame = (previewLayer?.frame)!
         line.backgroundColor = UIColor.clear
-        cameraPreview.addSubview(line)
+        cameraPreview?.addSubview(line)
         
         
         let btnTakePicture = UIButton()
@@ -164,19 +196,24 @@ class ViewController: UIViewController {
         btnFlashMode.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
         btnFlashMode.center = CGPoint(x: self.view.frame.width-btnFlashMode.bounds.width/2-25, y: btnFlashMode.bounds.height/2 + 25)
         btnFlashMode.addTarget(self, action: #selector(btnFlashModeAction), for: .touchUpInside)
+        board = Board(frame:(cameraPreview?.frame)!);
+        board.contentMode = .scaleAspectFit
+        
+        cameraPreview?.addSubview(focusView)
+        cameraPreview?.addSubview(board)
+        cameraPreview?.addSubview(bottomItemsView)
+        cameraPreview?.addSubview(btnFlashMode)
         
         
-        cameraPreview.addSubview(focusView)
-        cameraPreview.addSubview(bottomItemsView)
-        cameraPreview.addSubview(btnFlashMode)
-        view.addSubview(cameraPreview)
+        
+        view.addSubview(cameraPreview!)
         
         
     }
     
     func touchFocus(sender: UITapGestureRecognizer) {
         
-        let point =   sender.location(in: self.view)
+        let point =   sender.location(in: self.cameraPreview)
         
         let cp =  self.previewLayer?.captureDevicePointOfInterest(for: point)
         if (cp?.x)! > CGFloat(1){
@@ -240,19 +277,37 @@ class ViewController: UIViewController {
                     
                     let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
                     let img=UIImage(data: imageData!)!
+                    self.board.image=img;
+                    self.board.backgroundColor = UIColor(patternImage: self.board.takeImage())
+                    self.board.image=nil
                     
-                    let timage = img.crop(to: CGSize(width: 200, height: 200))
+                    self.board.drawImage()
+                    
+                    let zimage = self.board.takeImage()
+                    let timage = zimage.crop(to: CGSize(width: 200, height: 200))
                     
                     self.btnThumbnail.setImage(timage, for: UIControlState.normal)
                     
                     
-                    let tmpPath =  NSHomeDirectory()+"/Documents/"+self.childDir!+"/"+String(Int(Date().timeIntervalSince1970*1000))
+                    var tmpPath =  NSHomeDirectory()+"/Documents/"+self.childDir!;
+                    let manager = FileManager.default;
+                    let exist = manager.fileExists(atPath: tmpPath)
+                    if !exist {
+                        let url = URL(fileURLWithPath: tmpPath,isDirectory: true);
+                        try! manager.createDirectory(at: url, withIntermediateDirectories: true,attributes: nil)
+                    }
+                    
+                    tmpPath +=  "/"+String(Int(Date().timeIntervalSince1970*1000))
                     
                     let imagePath = tmpPath+".jpg"
                     
+                 
+                    
                     try? UIImageJPEGRepresentation(img, 0.7)?.write(to: URL(fileURLWithPath: imagePath))
                     try? UIImageJPEGRepresentation(timage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_t.jpg"))
+                    try? UIImageJPEGRepresentation(zimage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_z.jpg"))
                     
+                    self.board.backgroundColor = UIColor.clear
                     self.successCallBack?(imagePath)
                 }
             }

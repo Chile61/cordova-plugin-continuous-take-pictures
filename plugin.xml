@@ -23,6 +23,7 @@
 
     <source-file src="src/ios/ContinuousTakePicturesPlugin.swift"/>
     <source-file src="src/ios/ViewController.swift"/>
+    <source-file src="src/ios/Board.swift"/>
 
     <framework src="AVFoundation.framework"/>
     <framework src="AssetsLibrary.framework"/>
