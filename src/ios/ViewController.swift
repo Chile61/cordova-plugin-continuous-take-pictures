@@ -301,7 +301,14 @@ class ViewController: UIViewController {
                     
                     let imagePath = tmpPath+".jpg"
                     
-                 
+                    //                    let json = self.toJsonString(self.board.rects)
+                    //                    print(json)
+                    //                    let rects = self.toCGRectArr(json)
+                    
+                    //                    for rect in rects{
+                    //                        print("x:\(rect.origin.x),y:\(rect.origin.y),height:\(rect.size.height),width:\(rect.size.width)")
+                    //                    }
+                    
                     
                     try? UIImageJPEGRepresentation(img, 0.7)?.write(to: URL(fileURLWithPath: imagePath))
                     try? UIImageJPEGRepresentation(timage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_t.jpg"))
@@ -315,6 +322,40 @@ class ViewController: UIViewController {
         
         
         
+    }
+    
+    func toJsonString(_ rects:[CGRect]) -> String {
+        var res = [[String:CGFloat]]()
+        for rect in rects {
+            var r = [String:CGFloat]()
+            r["x"] = rect.origin.x
+            r["y"] = rect.origin.y
+            r["height"] = rect.size.height
+            r["width"] = rect.size.width
+            
+            res.append(r)
+        }
+        //如果设置options为JSONSerialization.WritingOptions.prettyPrinted，则打印格式更好阅读
+        let data = try? JSONSerialization.data(withJSONObject: res, options: [])
+        //Data转换成String打印输出
+        let str = String(data:data!, encoding: String.Encoding.utf8)
+        
+        return str!
+    }
+    
+    func toCGRectArr(_ json:String) -> [CGRect] {
+        var rects = [CGRect]()
+        let data = json.data(using: String.Encoding.utf8)
+        let jsonArr = try! JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! [[String:CGFloat]]
+        for ja in jsonArr {
+            var rect = CGRect()
+            rect.origin.x = ja["x"]!
+            rect.origin.y = ja["y"]!
+            rect.size.height = ja["height"]!
+            rect.size.width = ja["height"]!
+            rects.append(rect)
+        }
+        return rects;
     }
     
     func btnFlashModeAction(_ sender:Any){
