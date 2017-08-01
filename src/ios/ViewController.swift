@@ -51,6 +51,7 @@ class ViewController: UIViewController {
     open var successCallBack:((String?) -> Void)?
     open var cancelCallBack:(() -> Void)?
     open var childDir:String?
+    open var tpls:[[String:Any]]?
     
     //禁止旋转，仅支持竖着的。其他的待研究实现方式
     open override var shouldAutorotate:Bool{
@@ -207,7 +208,11 @@ class ViewController: UIViewController {
         cameraPreview?.addSubview(bottomItemsView)
         cameraPreview?.addSubview(btnFlashMode)
         
-        
+        let jsonArr = tpls?[0]["rects"] as? [[String:CGFloat]]
+        if jsonArr != nil {
+            self.board.rects = toCGRectArr(jsonArr!)
+            self.board.drawImage()
+        }
         
         view.addSubview(cameraPreview!)
         
@@ -304,8 +309,8 @@ class ViewController: UIViewController {
                     
                     let imagePath = tmpPath+".jpg"
                     
-                    let json = self.toJsonString(self.board.rects)
-                    print(json)
+//                    let json = self.toJsonString(self.board.rects)
+//                    print(json)
                     //                    let rects = self.toCGRectArr(json)
                     
                     //                    for rect in rects{
@@ -348,9 +353,11 @@ class ViewController: UIViewController {
             
             rectsTmp.append(r)
         }
-        var tpls = [String:Any]()
-        tpls["name"] = "默认模板"
-        tpls["rects"] = rectsTmp
+        var tpls = [[String:Any]]()
+        var tpl = [String:Any]()
+        tpl["name"] = "默认模板"
+        tpl["rects"] = rectsTmp
+        tpls.append(tpl)
         
         res["type"] = ReturnType.Cover.rawValue
         res["tpls"] = [String:Any]()
@@ -363,10 +370,9 @@ class ViewController: UIViewController {
         return str!
     }
     
-    func toCGRectArr(_ json:String) -> [CGRect] {
+    func toCGRectArr(_ jsonArr:[[String:CGFloat]]) -> [CGRect] {
         var rects = [CGRect]()
-        let data = json.data(using: String.Encoding.utf8)
-        let jsonArr = try! JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! [[String:CGFloat]]
+     
         for ja in jsonArr {
             var rect = CGRect()
             rect.origin.x = ja["x"]!

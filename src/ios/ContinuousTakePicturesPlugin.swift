@@ -28,6 +28,11 @@ import AVFoundation
         vc.successCallBack = successCallBack
         vc.cancelCallBack = cancelCallBack
         vc.childDir = command.arguments[0] as? String
+        let strTpls = command.arguments[1] as? String
+        if strTpls?.isEmpty == false {
+            let data = strTpls?.data(using: String.Encoding.utf8)
+            vc.tpls = try! JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! [[String:Any]]
+        }
         self.viewController?.present(vc, animated: false,completion: nil)
 
     }
