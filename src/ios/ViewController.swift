@@ -105,6 +105,9 @@ class ViewController: UIViewController {
         board.endPoint = touches.first!.location(in: self.board)
         board.drawingState = .ended
         board.drawingImage()
+        
+        let str = toJsonString(self.board.rects)
+        self.successCallBack?(str)
     }
     
     
@@ -301,8 +304,8 @@ class ViewController: UIViewController {
                     
                     let imagePath = tmpPath+".jpg"
                     
-                    //                    let json = self.toJsonString(self.board.rects)
-                    //                    print(json)
+                    let json = self.toJsonString(self.board.rects)
+                    print(json)
                     //                    let rects = self.toCGRectArr(json)
                     
                     //                    for rect in rects{
@@ -315,7 +318,15 @@ class ViewController: UIViewController {
                     try? UIImageJPEGRepresentation(zimage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_z.jpg"))
                     
                     self.board.backgroundColor = UIColor.clear
-                    self.successCallBack?(imagePath)
+                    
+                    var res = [String:String]()
+                    res["type"] = ReturnType.TakePicture.rawValue
+                    res["imagePath"] = imagePath
+                    
+                    let data = try? JSONSerialization.data(withJSONObject: res, options: [])
+                    let str = String(data:data!, encoding: String.Encoding.utf8)
+                    
+                    self.successCallBack?(str)
                 }
             }
         }
@@ -325,7 +336,9 @@ class ViewController: UIViewController {
     }
     
     func toJsonString(_ rects:[CGRect]) -> String {
-        var res = [[String:CGFloat]]()
+        var res = [String:Any]()
+        
+        var rectsTmp = [[String:CGFloat]]()
         for rect in rects {
             var r = [String:CGFloat]()
             r["x"] = rect.origin.x
@@ -333,11 +346,18 @@ class ViewController: UIViewController {
             r["height"] = rect.size.height
             r["width"] = rect.size.width
             
-            res.append(r)
+            rectsTmp.append(r)
         }
+        var tpls = [String:Any]()
+        tpls["name"] = "默认模板"
+        tpls["rects"] = rectsTmp
+        
+        res["type"] = ReturnType.Cover.rawValue
+        res["tpls"] = [String:Any]()
+        res["tpls"] = tpls
+        
         //如果设置options为JSONSerialization.WritingOptions.prettyPrinted，则打印格式更好阅读
         let data = try? JSONSerialization.data(withJSONObject: res, options: [])
-        //Data转换成String打印输出
         let str = String(data:data!, encoding: String.Encoding.utf8)
         
         return str!
@@ -381,7 +401,11 @@ class ViewController: UIViewController {
 }
 
 
-
+enum ReturnType :String{
+    case TakePicture
+    case Cover
+    
+}
 
 extension UIImage {
     
