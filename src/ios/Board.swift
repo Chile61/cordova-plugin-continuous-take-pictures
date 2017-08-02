@@ -14,11 +14,9 @@ class Board: UIImageView {
     var color: UIColor = UIColor.black
     
     
-    var drawingStateChangedBlock: ((_ state: DrawingState) -> ())?
-    
     fileprivate var realImage: UIImage?
     
-    var drawingState: DrawingState!
+    var drawingState: DrawingState = .ended
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -46,11 +44,6 @@ class Board: UIImageView {
     
     func drawingImage() {
         
-        // hook
-        if let drawingStateChangedBlock = self.drawingStateChangedBlock {
-            drawingStateChangedBlock(self.drawingState)
-        }
-        
         UIGraphicsBeginImageContext(self.bounds.size)
         
         let context = UIGraphicsGetCurrentContext()
@@ -62,7 +55,6 @@ class Board: UIImageView {
         if let realImage = self.realImage {
             realImage.draw(in: self.bounds)
         }
-        
         let point = CGPoint(x: min(beginPoint.x, endPoint.x), y: min(beginPoint.y, endPoint.y))
         var size = CGSize(width: abs(endPoint.x - beginPoint.x), height: abs(endPoint.y - beginPoint.y))
         if size.height < 6 {

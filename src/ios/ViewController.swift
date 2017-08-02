@@ -91,7 +91,10 @@ class ViewController: UIViewController {
         if isDrawing == false {
             return
         }
-        
+        if board.drawingState != .ended {
+            board.endPoint = board.lastPoint
+            boardEndDraw()
+        }
         board.lastPoint = nil
         board.beginPoint = touches.first!.location(in: self.board)
         board.endPoint = board.beginPoint
@@ -123,6 +126,10 @@ class ViewController: UIViewController {
         }
         
         board.endPoint = touches.first!.location(in: self.board)
+        boardEndDraw()
+    }
+    
+    func boardEndDraw() -> Void {
         board.drawingState = .ended
         board.drawingImage()
         
