@@ -98,7 +98,7 @@ class Board: UIImageView {
     
     func drawImage() {
         UIGraphicsBeginImageContext(self.bounds.size)
-
+        
         let context = UIGraphicsGetCurrentContext()
         UIColor.clear.setFill()
         UIRectFill(self.bounds)
@@ -110,5 +110,6 @@ class Board: UIImageView {
         
         UIGraphicsEndImageContext()
         self.image = previewImage
+        self.realImage = previewImage
     }
 }
