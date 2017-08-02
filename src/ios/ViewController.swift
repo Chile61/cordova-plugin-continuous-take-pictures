@@ -368,17 +368,7 @@ class ViewController: UIViewController {
                     
                     let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
                     let img=UIImage(data: imageData!)!
-                    self.board.image=img;
-                    self.board.backgroundColor = UIColor(patternImage: self.board.takeImage())
-                    self.board.image=nil
-                    
-                    self.board.drawImage()
-                    
-                    let zimage = self.board.takeImage()
-                    let timage = zimage.crop(to: CGSize(width: 200, height: 200))
-                    
-                    self.btnThumbnail.setImage(timage, for: UIControlState.normal)
-                    
+                    var zimage = img
                     
                     var tmpPath =  NSHomeDirectory()+"/Documents/"+self.childDir!;
                     let manager = FileManager.default;
@@ -392,24 +382,33 @@ class ViewController: UIViewController {
                     
                     let imagePath = tmpPath+".jpg"
                     
-                    //                    let json = self.toJsonString(self.board.rects)
-                    //                    print(json)
-                    //                    let rects = self.toCGRectArr(json)
+                    var res = [String:String]()
+                    res["type"] = ReturnType.TakePicture.rawValue
+                    res["imagePath"] = imagePath
                     
-                    //                    for rect in rects{
-                    //                        print("x:\(rect.origin.x),y:\(rect.origin.y),height:\(rect.size.height),width:\(rect.size.width)")
-                    //                    }
+                    if self.board.rects.count > 0 {
+                        self.board.image=img;
+                        self.board.backgroundColor = UIColor(patternImage: self.board.takeImage())
+                        self.board.image=nil
+                        
+                        self.board.drawImage()
+                        zimage = self.board.takeImage()
+                        
+                        try? UIImageJPEGRepresentation(zimage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_z.jpg"))
+                        
+                        self.board.backgroundColor = UIColor.clear
+                        res["tplName"] = "默认模板"
+                    }
+                    
+                    
+                    let timage = zimage.crop(to: CGSize(width: 200, height: 200))
+                    
+                    self.btnThumbnail.setImage(timage, for: UIControlState.normal)
                     
                     
                     try? UIImageJPEGRepresentation(img, 0.7)?.write(to: URL(fileURLWithPath: imagePath))
                     try? UIImageJPEGRepresentation(timage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_t.jpg"))
-                    try? UIImageJPEGRepresentation(zimage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_z.jpg"))
                     
-                    self.board.backgroundColor = UIColor.clear
-                    
-                    var res = [String:String]()
-                    res["type"] = ReturnType.TakePicture.rawValue
-                    res["imagePath"] = imagePath
                     
                     let data = try? JSONSerialization.data(withJSONObject: res, options: [])
                     let str = String(data:data!, encoding: String.Encoding.utf8)
