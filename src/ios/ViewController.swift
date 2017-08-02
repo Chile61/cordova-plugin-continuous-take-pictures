@@ -279,9 +279,11 @@ class ViewController: UIViewController {
     }
     
     func btnUndoAction(_ sender:Any){
-        self.board.rects.removeLast()
-        self.board.drawImage()
-        returnCoverTpls()
+        if self.board.rects.count != 0{
+            self.board.rects.removeLast()
+            self.board.drawImage()
+            returnCoverTpls()
+        }
     }
     
     func btnClearAction(_ sender:Any){
@@ -292,7 +294,7 @@ class ViewController: UIViewController {
     
     func touchFocus(sender: UITapGestureRecognizer) {
         if isDrawing == true {
-        return
+            return
         }
         
         let point =   sender.location(in: self.cameraPreview)
@@ -318,12 +320,12 @@ class ViewController: UIViewController {
         
         UIView.animate(withDuration: 0.3, animations: {
             self.focusView.transform = CGAffineTransform(scaleX: 1.25, y: 1.25)
-            }) { (finished) in
-                UIView.animate(withDuration: 0.5, animations: {
+        }) { (finished) in
+            UIView.animate(withDuration: 0.5, animations: {
                 self.focusView.transform = CGAffineTransform(scaleX: 1, y: 1)
-                }, completion: { (f) in
-                    self.focusView.isHidden = true
-                })
+            }, completion: { (f) in
+                self.focusView.isHidden = true
+            })
         }
         
         
@@ -351,62 +353,62 @@ class ViewController: UIViewController {
         let queue = DispatchQueue(label: "com.servbus.takePhoto")
         queue.async {
             if let videoConnection = self.stillImageOutput.connection(withMediaType: AVMediaTypeVideo) {
-            self.stillImageOutput.captureStillImageAsynchronously(from: videoConnection) {
-                (imageDataSampleBuffer, error) -> Void in
-                if imageDataSampleBuffer == nil {
-                    return
+                self.stillImageOutput.captureStillImageAsynchronously(from: videoConnection) {
+                    (imageDataSampleBuffer, error) -> Void in
+                    if imageDataSampleBuffer == nil {
+                        return
+                    }
+                    
+                    let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
+                    let img=UIImage(data: imageData!)!
+                    self.board.image=img;
+                    self.board.backgroundColor = UIColor(patternImage: self.board.takeImage())
+                    self.board.image=nil
+                    
+                    self.board.drawImage()
+                    
+                    let zimage = self.board.takeImage()
+                    let timage = zimage.crop(to: CGSize(width: 200, height: 200))
+                    
+                    self.btnThumbnail.setImage(timage, for: UIControlState.normal)
+                    
+                    
+                    var tmpPath =  NSHomeDirectory()+"/Documents/"+self.childDir!;
+                    let manager = FileManager.default;
+                    let exist = manager.fileExists(atPath: tmpPath)
+                    if !exist {
+                        let url = URL(fileURLWithPath: tmpPath,isDirectory: true);
+                        try! manager.createDirectory(at: url, withIntermediateDirectories: true,attributes: nil)
+                    }
+                    
+                    tmpPath +=  "/"+String(Int(Date().timeIntervalSince1970*1000))
+                    
+                    let imagePath = tmpPath+".jpg"
+                    
+                    //                    let json = self.toJsonString(self.board.rects)
+                    //                    print(json)
+                    //                    let rects = self.toCGRectArr(json)
+                    
+                    //                    for rect in rects{
+                    //                        print("x:\(rect.origin.x),y:\(rect.origin.y),height:\(rect.size.height),width:\(rect.size.width)")
+                    //                    }
+                    
+                    
+                    try? UIImageJPEGRepresentation(img, 0.7)?.write(to: URL(fileURLWithPath: imagePath))
+                    try? UIImageJPEGRepresentation(timage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_t.jpg"))
+                    try? UIImageJPEGRepresentation(zimage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_z.jpg"))
+                    
+                    self.board.backgroundColor = UIColor.clear
+                    
+                    var res = [String:String]()
+                    res["type"] = ReturnType.TakePicture.rawValue
+                    res["imagePath"] = imagePath
+                    
+                    let data = try? JSONSerialization.data(withJSONObject: res, options: [])
+                    let str = String(data:data!, encoding: String.Encoding.utf8)
+                    
+                    self.successCallBack?(str)
                 }
-                
-                let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
-                let img=UIImage(data: imageData!)!
-                self.board.image=img;
-                self.board.backgroundColor = UIColor(patternImage: self.board.takeImage())
-                self.board.image=nil
-                
-                self.board.drawImage()
-                
-                let zimage = self.board.takeImage()
-                let timage = zimage.crop(to: CGSize(width: 200, height: 200))
-                
-                self.btnThumbnail.setImage(timage, for: UIControlState.normal)
-                
-                
-                var tmpPath =  NSHomeDirectory()+"/Documents/"+self.childDir!;
-                let manager = FileManager.default;
-                let exist = manager.fileExists(atPath: tmpPath)
-                if !exist {
-                    let url = URL(fileURLWithPath: tmpPath,isDirectory: true);
-                    try! manager.createDirectory(at: url, withIntermediateDirectories: true,attributes: nil)
-                }
-                
-                tmpPath +=  "/"+String(Int(Date().timeIntervalSince1970*1000))
-                
-                let imagePath = tmpPath+".jpg"
-                
-                //                    let json = self.toJsonString(self.board.rects)
-                //                    print(json)
-                //                    let rects = self.toCGRectArr(json)
-                
-                //                    for rect in rects{
-                //                        print("x:\(rect.origin.x),y:\(rect.origin.y),height:\(rect.size.height),width:\(rect.size.width)")
-                //                    }
-                
-                
-                try? UIImageJPEGRepresentation(img, 0.7)?.write(to: URL(fileURLWithPath: imagePath))
-                try? UIImageJPEGRepresentation(timage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_t.jpg"))
-                try? UIImageJPEGRepresentation(zimage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_z.jpg"))
-                
-                self.board.backgroundColor = UIColor.clear
-                
-                var res = [String:String]()
-                res["type"] = ReturnType.TakePicture.rawValue
-                res["imagePath"] = imagePath
-                
-                let data = try? JSONSerialization.data(withJSONObject: res, options: [])
-                let str = String(data:data!, encoding: String.Encoding.utf8)
-                
-                self.successCallBack?(str)
-            }
             }
         }
         
@@ -464,13 +466,13 @@ class ViewController: UIViewController {
         switch self.captureDevice!.flashMode {
         case .auto:
             self.captureDevice!.flashMode   = .on
-        btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_on"), for: .normal)
+            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_on"), for: .normal)
         case .on:
             self.captureDevice!.flashMode = .off
-        btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_off"), for: .normal)
+            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_off"), for: .normal)
         case .off:
             self.captureDevice!.flashMode  = .auto
-        btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_auto"), for: .normal)
+            btnFlashMode.setImage(UIImage(named: "Camera.bundle/btn_camera_flash_auto"), for: .normal)
         }
         self.captureDevice?.unlockForConfiguration()
     }
@@ -514,13 +516,13 @@ extension UIImage {
             posX = (contextSize.width - cropWidth) / 2
         } else { //Square
             if contextSize.width >= contextSize.height { //Square on landscape (or square)
-            cropHeight = contextSize.height
-            cropWidth = contextSize.height * cropAspect
-            posX = (contextSize.width - cropWidth) / 2
-        }else{ //Square on portrait
-            cropWidth = contextSize.width
-            cropHeight = contextSize.width / cropAspect
-            posY = (contextSize.height - cropHeight) / 2
+                cropHeight = contextSize.height
+                cropWidth = contextSize.height * cropAspect
+                posX = (contextSize.width - cropWidth) / 2
+            }else{ //Square on portrait
+                cropWidth = contextSize.width
+                cropHeight = contextSize.width / cropAspect
+                posY = (contextSize.height - cropHeight) / 2
             }
         }
         
