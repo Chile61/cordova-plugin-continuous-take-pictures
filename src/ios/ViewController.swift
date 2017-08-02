@@ -454,7 +454,7 @@ class ViewController: UIViewController {
             rect.origin.x = ja["x"]!
             rect.origin.y = ja["y"]!
             rect.size.height = ja["height"]!
-            rect.size.width = ja["height"]!
+            rect.size.width = ja["width"]!
             rects.append(rect)
         }
         return rects;
