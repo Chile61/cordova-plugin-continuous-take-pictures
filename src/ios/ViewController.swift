@@ -194,18 +194,20 @@ class ViewController: UIViewController {
         let yMax = self.view.frame.maxY - self.view.frame.minY
         
         let size = CGSize(width:80, height:80);
-        let bottomItemsView = UIView(frame:CGRect( origin:CGPoint(x:0.0, y:yMax-115), size:CGSize(width:self.view.frame.size.width, height:115) ) )
+        let bottomItemsViewHeight:CGFloat = 160
+        let bottomItemsView = UIView(frame:CGRect( origin:CGPoint(x:0.0, y:yMax-bottomItemsViewHeight), size:CGSize(width:self.view.frame.size.width, height:bottomItemsViewHeight) ) )
         bottomItemsView.backgroundColor = UIColor.white
         
-        
+        //拍照行中心线
+        let tCenterHeight = bottomItemsViewHeight - (size.height/2+20)
         btnTakePicture.bounds = CGRect(origin:CGPoint(x:0,y:0), size:size)
-        btnTakePicture.center = CGPoint(x:bottomItemsView.frame.width/2, y:bottomItemsView.frame.height/2)
+        btnTakePicture.center = CGPoint(x:bottomItemsView.frame.width/2, y:tCenterHeight)
         btnTakePicture.addTarget(self, action: #selector(btnTakePicAction), for: UIControlEvents.touchUpInside)
         
         bottomItemsView.addSubview(btnTakePicture)
         
         btnThumbnail.bounds = CGRect(x: 0, y: 0, width: size.width-30, height: size.height-30)
-        btnThumbnail.center = CGPoint(x: btnThumbnail.bounds.width/2+10, y: bottomItemsView.frame.height/2)
+        btnThumbnail.center = CGPoint(x: btnThumbnail.bounds.width/2+10, y: tCenterHeight)
         btnThumbnail.clipsToBounds=true
         btnThumbnail.layer.cornerRadius = btnThumbnail.bounds.width/2
         btnThumbnail.setImage(UIImage(named: "Camera.bundle/image_default"), for: .normal)
@@ -217,7 +219,7 @@ class ViewController: UIViewController {
         let btnCancel = UIButton()
         btnCancel.setImage(UIImage(named: "Camera.bundle/btn_ok"), for: .normal)
         btnCancel.bounds = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-        btnCancel.center = CGPoint(x: bottomItemsView.frame.width-btnCancel.bounds.width/2-10, y: bottomItemsView.frame.height/2)
+        btnCancel.center = CGPoint(x: bottomItemsView.frame.width-btnCancel.bounds.width/2-10, y: tCenterHeight)
         btnCancel.addTarget(self, action: #selector(btnCancelAction), for: UIControlEvents.touchUpInside)
         
         bottomItemsView.addSubview(btnCancel)
@@ -229,30 +231,39 @@ class ViewController: UIViewController {
         btnFlashMode.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
         btnFlashMode.center = CGPoint(x: self.view.frame.width-btnFlashMode.bounds.width/2-25, y: btnFlashMode.bounds.height/2 + 25)
         btnFlashMode.addTarget(self, action: #selector(btnFlashModeAction), for: .touchUpInside)
+        
         board = Board(frame:(cameraPreview?.frame)!);
         board.contentMode = .scaleAspectFit
+        board.isHidden = true
+        
+        //绘制按钮组中心线
+        let dCenterY:CGFloat = 30;
+        let dTitleColor = UIColor(red: 253/255.0, green: 154/255.0, blue: 0, alpha: 1)
         
         let btnDraw = UIButton()
         btnDraw.bounds = CGRect(x: 0, y: 0, width: 120, height: 40)
-        btnDraw.center = CGPoint(x:40,y:40)
-        btnDraw.setTitle("绘制遮盖区域", for: .normal)
+        btnDraw.center = CGPoint(x:bottomItemsView.frame.width/2,y:dCenterY)
+        btnDraw.setTitle("进入绘制模式", for: .normal)
+        btnDraw.setTitleColor(dTitleColor, for: .normal)
         btnDraw.addTarget(self, action: #selector(btnDrawAction), for: UIControlEvents.touchUpInside)
         
         btnUndo.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
-        btnUndo.center = CGPoint(x:40,y:80)
+        btnUndo.center = CGPoint(x:bottomItemsView.frame.width-40,y:dCenterY)
         btnUndo.setTitle("撤销", for: .normal)
+        btnUndo.setTitleColor(dTitleColor, for: .normal)
         btnUndo.addTarget(self, action: #selector(btnUndoAction), for: UIControlEvents.touchUpInside)
         btnUndo.isHidden = true
         
         btnClear.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
-        btnClear.center = CGPoint(x:40,y:120)
+        btnClear.center = CGPoint(x:40,y:dCenterY)
         btnClear.setTitle("清空", for: .normal)
+        btnClear.setTitleColor(dTitleColor, for: .normal)
         btnClear.addTarget(self, action: #selector(btnClearAction), for: UIControlEvents.touchUpInside)
         btnClear.isHidden = true
         
-        cameraPreview?.addSubview(btnDraw)
-        cameraPreview?.addSubview(btnUndo)
-        cameraPreview?.addSubview(btnClear)
+        bottomItemsView.addSubview(btnDraw)
+        bottomItemsView.addSubview(btnUndo)
+        bottomItemsView.addSubview(btnClear)
         cameraPreview?.addSubview(board)
         cameraPreview?.addSubview(focusView)
         cameraPreview?.addSubview(bottomItemsView)
@@ -272,13 +283,15 @@ class ViewController: UIViewController {
     func btnDrawAction(_ sender:UIButton){
         
         if self.isDrawing == false {
-            sender.setTitle("绘制中", for: .normal)
+            sender.setTitle("退出绘制模式", for: .normal)
+            self.board.isHidden = false
             self.isDrawing = true
             self.btnClear.isHidden = false
             self.btnUndo.isHidden = false
             
         }else{
-            sender.setTitle("绘制遮盖区域", for: .normal)
+            sender.setTitle("进入绘制模式", for: .normal)
+            self.board.isHidden = true
             self.isDrawing = false
             self.btnClear.isHidden = true
             self.btnUndo.isHidden = true
@@ -346,7 +359,10 @@ class ViewController: UIViewController {
     }
     
     func btnTakePicAction(_ sender:Any){
-        
+        //可用存储空间
+        //        let fm =  try? FileManager().attributesOfFileSystem(forPath: NSHomeDirectory())
+        //        let size =  fm?[.systemFreeSize] as? Int
+        //        print((size ?? 0)/1024/1024)
         
         let animation = CABasicAnimation(keyPath: "opacity")
         animation.fromValue = 	1
@@ -386,7 +402,7 @@ class ViewController: UIViewController {
                     res["type"] = ReturnType.TakePicture.rawValue
                     res["imagePath"] = imagePath
                     
-                    if self.board.rects.count > 0 {
+                    if self.isDrawing && self.board.rects.count > 0 {
                         self.board.image=img;
                         self.board.backgroundColor = UIColor(patternImage: self.board.takeImage())
                         self.board.image=nil
