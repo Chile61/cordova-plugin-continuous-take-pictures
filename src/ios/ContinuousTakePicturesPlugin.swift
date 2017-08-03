@@ -33,6 +33,9 @@ import AVFoundation
             let data = strTpls?.data(using: String.Encoding.utf8)
             vc.tpls = try! JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! [[String:Any]]
         }
+        vc.isDrawing = (command.arguments[2] as? Bool) ?? false
+        vc.isNeedRecord = (command.arguments[3] as? Bool) ?? false
+        
         self.viewController?.present(vc, animated: false,completion: nil)
 
     }

@@ -19,6 +19,8 @@ ContinuousTakePictures.prototype.takePictures = function (successCallback, error
     var args = [];
     args[0] = config.dir || "tmp";
     args[1] = config.coverTpls || "";
+    args[2] = config.isDrawing || false;
+    args[3] = config.isNeedRecord || false;
 
 
     if (errorCallback == null) {

@@ -288,7 +288,15 @@ class ViewController: UIViewController {
         
         view.addSubview(cameraPreview!)
         
+        if self.isDrawing {
+            self.isDrawing = false
+            btnDrawAction(btnDraw)
+        }
         
+        if self.isNeedRecord {
+            self.isNeedRecord = false
+            btnNeedRecordAction(btnNeedRecord)
+        }
     }
     
     func btnNeedRecordAction(_ sender:UIButton){
@@ -301,6 +309,13 @@ class ViewController: UIViewController {
             sender.setTitleColor(UIColor.white, for: .normal)
             self.isNeedRecord = false
         }
+        var res = [String:Any]()
+        res["type"] = ReturnType.NeedRecordStatus.rawValue
+        res["status"] = self.isNeedRecord
+        let data = try? JSONSerialization.data(withJSONObject: res, options: [])
+        let str = String(data:data!, encoding: String.Encoding.utf8)
+        
+        self.successCallBack?(str)
     }
     
     func btnDrawAction(_ sender:UIButton){
@@ -321,6 +336,13 @@ class ViewController: UIViewController {
             self.btnUndo.isHidden = true
             self.btnNeedRecord.isHidden = true
         }
+        var res = [String:Any]()
+        res["type"] = ReturnType.DrawingStatus.rawValue
+        res["status"] = self.isDrawing
+        let data = try? JSONSerialization.data(withJSONObject: res, options: [])
+        let str = String(data:data!, encoding: String.Encoding.utf8)
+        
+        self.successCallBack?(str)
     }
     
     func btnUndoAction(_ sender:Any){
@@ -543,7 +565,8 @@ class ViewController: UIViewController {
 enum ReturnType :String{
     case TakePicture
     case Cover
-    
+    case DrawingStatus
+    case NeedRecordStatus
 }
 
 extension UIImage {
