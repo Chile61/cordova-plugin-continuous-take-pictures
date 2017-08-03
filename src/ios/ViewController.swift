@@ -48,8 +48,10 @@ class ViewController: UIViewController {
     
     var board:Board!
     var isDrawing = false
+    var isNeedRecord = false
     let btnUndo = UIButton()
-    let btnClear = UIButton();
+    let btnClear = UIButton()
+    let btnNeedRecord = UIButton()
     
     open var successCallBack:((String?) -> Void)?
     open var cancelCallBack:(() -> Void)?
@@ -261,10 +263,19 @@ class ViewController: UIViewController {
         btnClear.addTarget(self, action: #selector(btnClearAction), for: UIControlEvents.touchUpInside)
         btnClear.isHidden = true
         
+        btnNeedRecord.bounds = CGRect(x: 0, y: 0, width: 120, height: 40)
+        btnNeedRecord.center = CGPoint(x: 80, y: 40)
+        btnNeedRecord.setTitle("患者信息页", for: .normal)
+        
+        btnNeedRecord.addTarget(self, action: #selector(btnNeedRecordAction), for: .touchUpInside)
+        btnNeedRecord.isHidden = true
+        
         bottomItemsView.addSubview(btnDraw)
         bottomItemsView.addSubview(btnUndo)
         bottomItemsView.addSubview(btnClear)
+        
         cameraPreview?.addSubview(board)
+        cameraPreview?.addSubview(btnNeedRecord)
         cameraPreview?.addSubview(focusView)
         cameraPreview?.addSubview(bottomItemsView)
         cameraPreview?.addSubview(btnFlashMode)
@@ -280,6 +291,18 @@ class ViewController: UIViewController {
         
     }
     
+    func btnNeedRecordAction(_ sender:UIButton){
+        
+        if self.isNeedRecord == false {
+            sender.setTitleColor(UIColor.red, for: .normal)
+            self.isNeedRecord = true
+            
+        }else{
+            sender.setTitleColor(UIColor.white, for: .normal)
+            self.isNeedRecord = false
+        }
+    }
+    
     func btnDrawAction(_ sender:UIButton){
         
         if self.isDrawing == false {
@@ -288,6 +311,7 @@ class ViewController: UIViewController {
             self.isDrawing = true
             self.btnClear.isHidden = false
             self.btnUndo.isHidden = false
+            self.btnNeedRecord.isHidden = false
             
         }else{
             sender.setTitle("进入遮盖模式", for: .normal)
@@ -295,6 +319,7 @@ class ViewController: UIViewController {
             self.isDrawing = false
             self.btnClear.isHidden = true
             self.btnUndo.isHidden = true
+            self.btnNeedRecord.isHidden = true
         }
     }
     
@@ -360,9 +385,16 @@ class ViewController: UIViewController {
     
     func btnTakePicAction(_ sender:Any){
         //可用存储空间
-        //        let fm =  try? FileManager().attributesOfFileSystem(forPath: NSHomeDirectory())
-        //        let size =  fm?[.systemFreeSize] as? Int
-        //        print((size ?? 0)/1024/1024)
+        let kv =  try? FileManager().attributesOfFileSystem(forPath: NSHomeDirectory())
+        let size =  kv?[.systemFreeSize] as? Int
+        //为了确保数据安全拍摄功能需要可用存储空间大于100MB才可以使用
+        if (size ?? 0)/1024/1024 < 100 {
+            let cv=UIAlertController(title: "拍摄失败", message: "可用存储空间不足", preferredStyle: .alert);
+            let cancelAction=UIAlertAction(title: "知道了", style: .cancel, handler: nil);
+            cv.addAction(cancelAction);
+            self.present(cv, animated: false,completion: nil);
+            return
+        }
         
         let animation = CABasicAnimation(keyPath: "opacity")
         animation.fromValue = 	1
@@ -398,7 +430,7 @@ class ViewController: UIViewController {
                     
                     let imagePath = tmpPath+".jpg"
                     
-                    var res = [String:String]()
+                    var res = [String:Any]()
                     res["type"] = ReturnType.TakePicture.rawValue
                     res["imagePath"] = imagePath
                     
@@ -414,6 +446,9 @@ class ViewController: UIViewController {
                         
                         self.board.backgroundColor = UIColor.clear
                         res["tplName"] = "默认模板"
+                        if self.isNeedRecord == true {
+                            res["needRecord"] = true
+                        }
                     }
                     
                     
