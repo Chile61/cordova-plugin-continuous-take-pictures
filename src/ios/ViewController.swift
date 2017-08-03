@@ -243,7 +243,7 @@ class ViewController: UIViewController {
         let btnDraw = UIButton()
         btnDraw.bounds = CGRect(x: 0, y: 0, width: 120, height: 40)
         btnDraw.center = CGPoint(x:bottomItemsView.frame.width/2,y:dCenterY)
-        btnDraw.setTitle("进入绘制模式", for: .normal)
+        btnDraw.setTitle("进入遮盖模式", for: .normal)
         btnDraw.setTitleColor(dTitleColor, for: .normal)
         btnDraw.addTarget(self, action: #selector(btnDrawAction), for: UIControlEvents.touchUpInside)
         
@@ -283,14 +283,14 @@ class ViewController: UIViewController {
     func btnDrawAction(_ sender:UIButton){
         
         if self.isDrawing == false {
-            sender.setTitle("退出绘制模式", for: .normal)
+            sender.setTitle("退出遮盖模式", for: .normal)
             self.board.isHidden = false
             self.isDrawing = true
             self.btnClear.isHidden = false
             self.btnUndo.isHidden = false
             
         }else{
-            sender.setTitle("进入绘制模式", for: .normal)
+            sender.setTitle("进入遮盖模式", for: .normal)
             self.board.isHidden = true
             self.isDrawing = false
             self.btnClear.isHidden = true
