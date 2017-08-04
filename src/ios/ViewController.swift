@@ -457,6 +457,7 @@ class ViewController: UIViewController {
                     res["imagePath"] = imagePath
                     
                     if self.isDrawing && self.board.rects.count > 0 {
+                        
                         self.board.image=img;
                         self.board.backgroundColor = UIColor(patternImage: self.board.takeImage())
                         self.board.image=nil
@@ -467,10 +468,22 @@ class ViewController: UIViewController {
                         try? UIImageJPEGRepresentation(zimage, 0.7)?.write(to: URL(fileURLWithPath: tmpPath+"_z.jpg"))
                         
                         self.board.backgroundColor = UIColor.clear
-                        res["tplName"] = "默认模板"
+                        
+                        
                         if self.isNeedRecord == true {
                             res["needRecord"] = true
                         }
+                        var rects = [[String:Int]]()
+                        for rect in self.board.rects {
+                            var r = [String:Int]()
+                            r["x"] = Int(img.size.width/zimage.size.width*rect.origin.x)
+                            r["y"] = Int(img.size.height/zimage.size.height*rect.origin.y)
+                            r["width"] = Int(img.size.width/zimage.size.width*rect.size.width)
+                            r["height"] = Int(img.size.height/zimage.size.height*rect.size.height)
+                            
+                            rects.append(r)
+                        }
+                        res["rects"] = rects
                     }
                     
                     
